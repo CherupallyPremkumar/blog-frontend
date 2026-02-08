@@ -29,16 +29,7 @@ export const metadata: Metadata = {
   creator: "Prem Kumar",
   publisher: "IOClick",
 
-  // Favicon and icons
-  icons: {
-    icon: [
-      { url: "/icon.png", sizes: "32x32", type: "image/png" },
-      { url: "/icon.png", sizes: "192x192", type: "image/png" },
-    ],
-    apple: [
-      { url: "/icon.png", sizes: "180x180", type: "image/png" },
-    ],
-  },
+
 
   // Open Graph metadata for social sharing
   openGraph: {
