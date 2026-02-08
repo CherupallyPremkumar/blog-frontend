@@ -293,7 +293,11 @@ function formatContent(content: string): string {
     // Helper to fix image URLs
     const fixImageUrl = (url: string): string => {
         if (!url) return url;
-        // Already absolute URL
+        // Replace localhost URLs with production Strapi URL
+        if (url.includes('localhost:1337')) {
+            return url.replace(/http:\/\/localhost:1337/g, strapiUrl);
+        }
+        // Already absolute URL (not localhost)
         if (url.startsWith('http://') || url.startsWith('https://')) return url;
         // Relative path starting with /
         if (url.startsWith('/')) return `${strapiUrl}${url}`;
@@ -312,8 +316,15 @@ function formatContent(content: string): string {
             const fixedUrl = `${strapiUrl}/uploads/${filename}`;
             return `<figure class="my-6"><img src="${fixedUrl}" alt="${filename}" class="w-full" loading="lazy" /><figcaption class="mt-2 text-center text-sm text-gray-500 italic">${filename}</figcaption></figure>`;
         })
-        // Links (must come after images) - handle optional space
-        .replace(/\[(.*?)\]\s*\((.*?)\)/g, '<a href="$2" class="text-blue-600 underline hover:text-blue-800" target="_blank" rel="noopener noreferrer">$1</a>')
+        // Links (must come after images) - handle optional space and fix localhost URLs
+        .replace(/\[(.*?)\]\s*\((.*?)\)/g, (match, text, url) => {
+            let fixedUrl = url;
+            if (url.includes('localhost:3000')) {
+                const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
+                fixedUrl = url.replace(/http:\/\/localhost:3000/g, siteUrl);
+            }
+            return `<a href="${fixedUrl}" class="text-blue-600 underline hover:text-blue-800">${text}</a>`;
+        })
         // Headers
         .replace(/^### (.*$)/gm, '<h3 class="text-xl font-bold text-gray-900 mt-8 mb-4">$1</h3>')
         .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">$1</h2>')
