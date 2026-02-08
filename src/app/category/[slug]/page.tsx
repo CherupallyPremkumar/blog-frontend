@@ -50,22 +50,26 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
     return (
         <PageLayout showBackLink>
-            <div className="mb-12">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                    {category.name}
-                </h1>
-                <p className="text-gray-600">
-                    {articles.length} article{articles.length !== 1 ? 's' : ''} in this category
-                </p>
-            </div>
-
-            {articles.length === 0 ? (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                    <p className="text-gray-500">No articles found in this category yet.</p>
+            <div className="max-w-4xl mx-auto w-full px-6 py-8 md:py-12">
+                <div className="mb-8 border-b border-gray-100 pb-4">
+                    <div className="flex items-center justify-between">
+                        <h1 className="text-xl font-bold text-gray-900 tracking-tight">
+                            {category.name}
+                        </h1>
+                        <span className="text-xs font-medium px-3 py-1 bg-gray-100 text-gray-600 rounded-full">
+                            {articles.length} article{articles.length !== 1 ? 's' : ''}
+                        </span>
+                    </div>
                 </div>
-            ) : (
-                <Timeline articles={articles} />
-            )}
+
+                {articles.length === 0 ? (
+                    <div className="text-center py-12 bg-gray-50 rounded-lg">
+                        <p className="text-gray-500">No articles found in this category yet.</p>
+                    </div>
+                ) : (
+                    <Timeline articles={articles} />
+                )}
+            </div>
         </PageLayout>
     );
 }
