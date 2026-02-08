@@ -209,13 +209,14 @@ function buildCategoryTree(categories: Category[]): Category[] {
     });
 
     // Recursively sort all levels by the order field
-    const sortCategories = (nodes: any[]) => {
+    const sortCategories = (nodes: Category[]): Category[] => {
         nodes.sort((a, b) => (a.order || 0) - (b.order || 0));
         nodes.forEach(node => {
             if (node.children && node.children.length > 0) {
                 sortCategories(node.children);
             }
         });
+        return nodes;
     };
 
     sortCategories(roots);

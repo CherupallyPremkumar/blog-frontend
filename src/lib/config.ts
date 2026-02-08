@@ -80,8 +80,11 @@ export type Config = typeof config;
 export function validateConfig(): void {
     // This will throw if required env vars are missing
     // Called implicitly when config is imported
-    console.log(`[Config] Environment: ${process.env.NODE_ENV}`);
-    console.log(`[Config] Strapi URL: ${config.api.strapiUrl}`);
+    // Log only in development
+    if (process.env.NODE_ENV === 'development') {
+        console.log(`[Config] Environment: ${process.env.NODE_ENV}`);
+        console.log(`[Config] Strapi URL: ${config.api.strapiUrl}`);
+    }
 
     // Warn about security issues in production
     if (config.isProd && config.api.strapiUrl.includes('localhost')) {

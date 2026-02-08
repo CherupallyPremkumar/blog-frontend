@@ -30,6 +30,11 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 
+  // Turbopack configuration
+  turbopack: {
+    root: process.cwd(), // Explicitly set workspace root to current directory
+  },
+
   // Security headers
   async headers() {
     return [

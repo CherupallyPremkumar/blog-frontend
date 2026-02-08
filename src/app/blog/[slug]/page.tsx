@@ -175,43 +175,43 @@ export default async function ArticlePage({ params }: PageProps) {
                         <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
                         <span className="opacity-30">/</span>
                         <Link href="/categories" className="hover:text-blue-600 transition-colors">Categories</Link>
-                        {article.category?.parent && (
+                        {article!.category?.parent && (
                             <>
                                 <span className="opacity-30">/</span>
                                 <Link
-                                    href={`/category/${article.category.parent.slug}`}
+                                    href={`/category/${article!.category.parent.slug}`}
                                     className="hover:text-blue-600 transition-colors"
                                 >
-                                    {article.category.parent.name}
+                                    {article!.category.parent.name}
                                 </Link>
                             </>
                         )}
-                        {article.category && (
+                        {article!.category && (
                             <>
                                 <span className="opacity-30">/</span>
                                 <Link
-                                    href={`/category/${article.category.slug}`}
+                                    href={`/category/${article!.category.slug}`}
                                     className="hover:text-blue-600 transition-colors"
                                 >
-                                    {article.category.name}
+                                    {article!.category.name}
                                 </Link>
                             </>
                         )}
                         <span className="opacity-30">/</span>
-                        <span className="text-gray-900 font-medium truncate">{article.title}</span>
+                        <span className="text-gray-900 font-medium truncate">{article!.title}</span>
                     </nav>
 
                     {/* Meta */}
                     <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
-                        {article.category && (
+                        {article!.category && (
                             <span className="uppercase text-xs tracking-wide">
-                                {article.category.name}
+                                {article!.category.name}
                             </span>
                         )}
-                        {article.category && article.publishedAt && <span aria-hidden="true">•</span>}
-                        {article.publishedAt && (
-                            <time dateTime={article.publishedAt}>
-                                {new Date(article.publishedAt).toLocaleDateString("en-US", {
+                        {article!.category && article!.publishedAt && <span aria-hidden="true">•</span>}
+                        {article!.publishedAt && (
+                            <time dateTime={article!.publishedAt}>
+                                {new Date(article!.publishedAt).toLocaleDateString("en-US", {
                                     year: "numeric",
                                     month: "long",
                                     day: "numeric",
@@ -222,32 +222,32 @@ export default async function ArticlePage({ params }: PageProps) {
 
                     {/* Title */}
                     <h1 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
-                        {article.title}
+                        {article!.title}
                     </h1>
 
                     {/* Author */}
-                    {article.author && (
+                    {article!.author && (
                         <div className="flex items-center gap-3 mb-8 pb-8 border-b border-gray-200">
                             <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-sm font-medium text-gray-600 overflow-hidden">
-                                {article.author.avatar ? (
+                                {article!.author.avatar ? (
                                     <Image
-                                        src={getImageUrl(article.author.avatar, 'thumbnail') || ''}
-                                        alt={article.author.name}
+                                        src={getImageUrl(article!.author.avatar, 'thumbnail') || ''}
+                                        alt={article!.author.name}
                                         width={40}
                                         height={40}
                                         className="object-cover"
                                     />
                                 ) : (
-                                    <span aria-hidden="true">{article.author.name?.charAt(0) || "?"}</span>
+                                    <span aria-hidden="true">{article!.author.name?.charAt(0) || "?"}</span>
                                 )}
                             </div>
                             <div>
                                 <p className="font-medium text-gray-900">
-                                    {article.author.name}
+                                    {article!.author.name}
                                 </p>
-                                {article.author.bio && (
+                                {article!.author.bio && (
                                     <p className="text-sm text-gray-500">
-                                        {article.author.bio}
+                                        {article!.author.bio}
                                     </p>
                                 )}
                             </div>
@@ -260,7 +260,7 @@ export default async function ArticlePage({ params }: PageProps) {
                             <div className="relative w-full aspect-video bg-gray-100">
                                 <Image
                                     src={coverUrl}
-                                    alt={article.coverImage?.alternativeText || article.title}
+                                    alt={article!.coverImage?.alternativeText || article!.title}
                                     fill
                                     className="object-cover"
                                     priority
@@ -272,8 +272,8 @@ export default async function ArticlePage({ params }: PageProps) {
 
                     {/* Content Blocks */}
                     <div className="prose prose-lg max-w-none">
-                        {article.blocks && article.blocks.length > 0 ? (
-                            article.blocks.map((block, index) => (
+                        {article!.blocks && article!.blocks.length > 0 ? (
+                            article!.blocks.map((block, index) => (
                                 <BlockRenderer key={block.id || index} block={block} />
                             ))
                         ) : (
