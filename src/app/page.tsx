@@ -42,7 +42,7 @@ export default async function Home() {
       <Header />
 
       {/* Main Content */}
-      <main id="main-content" className="max-w-4xl mx-auto px-6 py-12 flex-1 w-full">
+      <main id="main-content" className="max-w-4xl mx-auto px-6 py-12 pt-32 flex-1 w-full">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           Blog Timeline
         </h1>

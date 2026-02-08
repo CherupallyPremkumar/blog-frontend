@@ -6,15 +6,15 @@ export default function Loading() {
     return (
         <div className="min-h-screen bg-white">
             {/* Header Skeleton */}
-            <header className="border-b border-gray-200">
-                <div className="max-w-4xl mx-auto px-6 py-6">
+            <header className="border-b border-gray-200 fixed top-0 left-0 right-0 bg-white z-50">
+                <div className="max-w-6xl mx-auto px-6 py-6">
                     <div className="h-8 w-24 bg-gray-200 rounded animate-pulse" />
                     <div className="h-4 w-64 bg-gray-100 rounded mt-2 animate-pulse" />
                 </div>
             </header>
 
             {/* Main Content Skeleton */}
-            <main className="max-w-4xl mx-auto px-6 py-12">
+            <main className="max-w-4xl mx-auto px-6 py-12 pt-32">
                 <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-2" />
                 <div className="h-4 w-32 bg-gray-100 rounded animate-pulse mb-12" />
 
