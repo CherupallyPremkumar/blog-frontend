@@ -43,17 +43,6 @@ export default async function Home() {
 
       {/* Main Content */}
       <main id="main-content" className="max-w-4xl mx-auto w-full flex-1 px-6 py-12 md:py-20">
-        {/* Hero Section */}
-        <div className="mb-20 pt-8">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 tracking-tight leading-tight">
-            Engineering <br className="hidden md:block" />
-            <span className="text-blue-600">&</span> System Design.
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl leading-relaxed">
-            Documenting my journey building scalable systems, exploring backend architecture, and solving complex engineering challenges.
-          </p>
-        </div>
-
         {/* Timeline Header */}
         <div className="flex items-center justify-between mb-16 border-b border-gray-100 pb-6">
           <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
