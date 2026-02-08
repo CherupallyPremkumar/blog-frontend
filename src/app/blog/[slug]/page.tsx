@@ -346,11 +346,11 @@ function formatContent(content: string): string {
         // Italic
         .replace(/\*(.*?)\*/g, "<em>$1</em>")
         // Numbered lists
-        .replace(/^\d+\. (.*$)/gm, '<li class="mb-2 text-gray-900">$1</li>')
+        .replace(/^\d+\. (.*$)/gm, '<li class="my-1 text-gray-900 leading-snug">$1</li>')
         // Bullet lists
-        .replace(/^- (.*$)/gm, '<li class="mb-2 text-gray-900">$1</li>')
+        .replace(/^- (.*$)/gm, '<li class="my-1 text-gray-900 leading-snug">$1</li>')
         // Bullet with •
-        .replace(/^• (.*$)/gm, '<li class="mb-2 text-gray-900">$1</li>')
+        .replace(/^• (.*$)/gm, '<li class="my-1 text-gray-900 leading-snug">$1</li>')
         // Paragraphs
         .split("\n\n")
         .map((p) => {
@@ -366,7 +366,7 @@ function formatContent(content: string): string {
                 }
                 return p;
             }
-            if (p.includes("<li>")) return `<ul class="list-disc pl-6 my-4 text-gray-900">${p}</ul>`;
+            if (p.includes("<li>")) return `<ul class="list-disc pl-6 my-2 text-gray-900 last:mb-0">${p}</ul>`;
             if (p.trim() === "") return "";
             // Convert single newlines to <br> and wrap in paragraph
             const withBreaks = p.replace(/\n/g, '<br/>');
