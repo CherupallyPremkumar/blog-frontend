@@ -46,23 +46,10 @@ export default function RichTextContent({ content }: RichTextContentProps) {
                     remarkPlugins={[remarkGfm]}
                     components={{
                         // Prevent p tags from wrapping figure elements (causes hydration errors)
-                        p({ children, ...props }) {
-                            // Check if the paragraph only contains an image
-                            const hasOnlyImage = Array.isArray(children)
-                                ? children.every(child =>
-                                    typeof child === 'object' &&
-                                    child !== null &&
-                                    'type' in child &&
-                                    (child.type === 'img' || child.type === 'figure')
-                                )
-                                : false;
-
-                            // If paragraph only contains images, render children directly
-                            if (hasOnlyImage) {
-                                return <>{children}</>;
-                            }
-
-                            return <p className="text-gray-900 leading-relaxed mb-4" {...props}>{children}</p>;
+                        p: ({ children, ...props }) => {
+                            // Using div instead of p to avoid invalid HTML nesting when containing block elements like figures
+                            // Visual styling mimics a paragraph
+                            return <div className="text-gray-900 leading-relaxed mb-4" {...props}>{children}</div>;
                         },
                         code({ className, children, ...props }) {
                             const match = /language-(\w+)/.exec(className || "");
