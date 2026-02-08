@@ -288,9 +288,13 @@ function BlockRenderer({ block }: { block: ContentBlock }) {
 function formatContent(content: string): string {
     if (!content) return "";
 
+    const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_API_URL || '';
+
     return content
-        // Images with optional space between ] and (
-        .replace(/!\[(.*?)\]\s*\((.*?)\)/g, '<figure class="my-6"><img src="$2" alt="$1" class="w-full" loading="lazy" /><figcaption class="mt-2 text-center text-sm text-gray-500 italic">$1</figcaption></figure>')
+        // Images with optional space between ] and ( - prepend Strapi URL for relative paths
+        .replace(/!\[(.*?)\]\s*\((\/uploads\/.*?)\)/g, `<figure class="my-6"><img src="${strapiUrl}$2" alt="$1" class="w-full" loading="lazy" /><figcaption class="mt-2 text-center text-sm text-gray-500 italic">$1</figcaption></figure>`)
+        // Images with full URLs (keep as is)
+        .replace(/!\[(.*?)\]\s*\((https?:\/\/.*?)\)/g, '<figure class="my-6"><img src="$2" alt="$1" class="w-full" loading="lazy" /><figcaption class="mt-2 text-center text-sm text-gray-500 italic">$1</figcaption></figure>')
         // Standalone image filenames (filename.png or filename.jpg on their own line)
         .replace(/^([A-Za-z0-9_\-\s]+\.(png|jpg|jpeg|gif|webp))$/gm, '<figure class="my-6 text-center text-sm text-gray-400 italic">[$1]</figure>')
         // Links (must come after images) - handle optional space
@@ -304,18 +308,18 @@ function formatContent(content: string): string {
         // Italic
         .replace(/\*(.*?)\*/g, "<em>$1</em>")
         // Numbered lists
-        .replace(/^\d+\. (.*$)/gm, '<li class="mb-2">$1</li>')
+        .replace(/^\d+\. (.*$)/gm, '<li class="mb-2 text-gray-800">$1</li>')
         // Bullet lists
-        .replace(/^- (.*$)/gm, '<li class="mb-2">$1</li>')
+        .replace(/^- (.*$)/gm, '<li class="mb-2 text-gray-800">$1</li>')
         // Bullet with •
-        .replace(/^• (.*$)/gm, '<li class="mb-2">$1</li>')
+        .replace(/^• (.*$)/gm, '<li class="mb-2 text-gray-800">$1</li>')
         // Paragraphs
         .split("\n\n")
         .map((p) => {
             if (p.startsWith("<h") || p.startsWith("<li") || p.startsWith("<figure")) return p;
-            if (p.includes("<li>")) return `<ul class="list-disc pl-6 my-4 text-gray-700">${p}</ul>`;
+            if (p.includes("<li>")) return `<ul class="list-disc pl-6 my-4 text-gray-800">${p}</ul>`;
             if (p.trim() === "") return "";
-            return `<p class="text-gray-700 leading-relaxed mb-4">${p}</p>`;
+            return `<p class="text-gray-800 leading-relaxed mb-4">${p}</p>`;
         })
         .join("\n");
 }
