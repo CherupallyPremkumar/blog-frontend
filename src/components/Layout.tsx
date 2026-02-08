@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { ReactNode } from "react";
 import { config } from "@/lib/config";
+import { getCategories } from "@/lib/api";
 
 // Shared header component
 interface HeaderProps {
     showBackLink?: boolean;
 }
 
-export function Header({ showBackLink = false }: HeaderProps) {
+export async function Header({ showBackLink = false }: HeaderProps) {
+    const categories = await getCategories();
+
     return (
         <header className="w-full border-b border-gray-200/50 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60">
             <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
@@ -42,6 +45,25 @@ export function Header({ showBackLink = false }: HeaderProps) {
                     </Link>
                 )}
             </div>
+
+            {/* Category Navigation */}
+            {categories.length > 0 && (
+                <div className="border-t border-gray-100/50">
+                    <div className="mx-auto max-w-6xl px-6">
+                        <nav className="flex items-center gap-6 overflow-x-auto py-3 no-scrollbar">
+                            {categories.map((category) => (
+                                <Link
+                                    key={category.documentId}
+                                    href={`/category/${category.slug}`}
+                                    className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors whitespace-nowrap"
+                                >
+                                    {category.name}
+                                </Link>
+                            ))}
+                        </nav>
+                    </div>
+                </div>
+            )}
         </header>
     );
 }
