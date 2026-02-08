@@ -143,32 +143,13 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                                 </section>
                             )}
 
-                            {/* Other Categories */}
-                            <section>
-                                <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-100 pb-2">
-                                    More Topics
-                                </h2>
-                                <div className="flex flex-wrap gap-2">
-                                    {allCategories
-                                        .filter(c => c.slug !== slug && !c.parent)
-                                        .slice(0, 8)
-                                        .map((cat) => (
-                                            <Link
-                                                key={cat.documentId}
-                                                href={`/category/${cat.slug}`}
-                                                className="px-4 py-2 rounded-full bg-white border border-gray-200 text-sm font-medium text-gray-600 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300"
-                                            >
-                                                {cat.name}
-                                            </Link>
-                                        ))}
-                                </div>
-                                <Link
-                                    href="/categories"
-                                    className="inline-block mt-6 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
-                                >
-                                    View All Categories →
-                                </Link>
-                            </section>
+                            {/* View All Categories Link */}
+                            <Link
+                                href="/categories"
+                                className="inline-block text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
+                            >
+                                View All Categories →
+                            </Link>
                         </div>
                     </div>
                 </div>
