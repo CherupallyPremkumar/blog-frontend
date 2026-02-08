@@ -1,0 +1,12 @@
+# Robots.txt for Blog
+# https://www.robotstxt.org/
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /api/
+
+# Sitemap location - update with your production domain
+# Sitemap: https://yourdomain.com/sitemap.xml
