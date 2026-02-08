@@ -117,7 +117,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                         </div>
 
                         {/* Sidebar */}
-                        <div className="lg:col-span-4 space-y-12">
+                        <div className="lg:col-span-4 space-y-12 sticky top-24 h-fit">
                             {/* Sub-categories (Explorer) */}
                             {category.children && category.children.length > 0 && (
                                 <section>
