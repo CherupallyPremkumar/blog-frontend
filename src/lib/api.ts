@@ -100,6 +100,14 @@ async function fetchAPI<T>(
             clearTimeout(timeoutId);
 
             if (!res.ok) {
+                // Special handling for 503 - backend is spinning up
+                if (res.status === 503 || res.status === 502) {
+                    throw new ApiError(
+                        'Backend is spinning up. Please wait...',
+                        res.status,
+                        'BACKEND_SPINNING'
+                    );
+                }
                 throw new ApiError(
                     `API request failed: ${res.status} ${res.statusText}`,
                     res.status
