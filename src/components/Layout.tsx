@@ -11,7 +11,7 @@ interface HeaderProps {
  */
 export function Header({ showBackLink = false }: HeaderProps) {
     return (
-        <header className="border-b border-gray-200">
+        <header className="border-b border-gray-200 sticky top-0 bg-white z-50">
             <div className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
                 <div>
                     <Link
