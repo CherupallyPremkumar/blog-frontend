@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 // Rate limiting configuration (in-memory - use Redis in production for scaling)
 const rateLimitMap = new Map<string, { count: number; lastReset: number }>();
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-const MAX_REQUESTS = 100; // requests per window
+const MAX_REQUESTS = 1000; // requests per window (increased from 100)
 
 /**
  * Get client IP from request
