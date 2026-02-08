@@ -50,8 +50,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
     return (
         <PageLayout showBackLink>
-            <div className="max-w-4xl mx-auto w-full px-6 py-8 md:py-12">
-                <div className="mb-8 border-b border-gray-100 pb-4">
+            <div className="max-w-4xl mx-auto w-full px-6 pt-0 pb-12 md:pb-16 md:pt-4">
+                <div className="mb-6 border-b border-gray-100 pb-4">
                     <div className="flex items-center justify-between">
                         <h1 className="text-xl font-bold text-gray-900 tracking-tight">
                             {category.name}
