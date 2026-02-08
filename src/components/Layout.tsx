@@ -11,7 +11,7 @@ interface HeaderProps {
  */
 export function Header({ showBackLink = false }: HeaderProps) {
     return (
-        <header className="border-b border-gray-200 sticky top-0 bg-white z-50">
+        <header className="border-b border-gray-200 fixed top-0 left-0 right-0 bg-white z-50">
             <div className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
                 <div>
                     <Link
@@ -73,7 +73,7 @@ export function PageLayout({
     return (
         <div className="min-h-screen bg-white flex flex-col">
             <Header showBackLink={showBackLink} />
-            <main className={`${maxWidthClass} mx-auto px-6 py-10 flex-1 w-full`}>
+            <main className={`${maxWidthClass} mx-auto px-6 py-10 pt-24 flex-1 w-full`}>
                 {children}
             </main>
             <Footer />
