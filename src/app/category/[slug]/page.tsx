@@ -118,27 +118,25 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
                         {/* Sidebar */}
                         <div className="lg:col-span-4 space-y-12">
-                            {/* Sub-categories */}
+                            {/* Sub-categories (Explorer) */}
                             {category.children && category.children.length > 0 && (
                                 <section>
                                     <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-100 pb-2">
-                                        Sub-topics
+                                        Explorer
                                     </h2>
-                                    <div className="grid grid-cols-1 gap-4">
+                                    <div className="flex flex-col gap-3">
                                         {category.children.map((child: Category) => (
                                             <Link
                                                 key={child.documentId}
                                                 href={`/category/${child.slug}`}
-                                                className="group p-5 rounded-2xl bg-gray-50 border border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-300"
+                                                className="group flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100 hover:border-blue-200 hover:bg-white hover:shadow-sm transition-all duration-200"
                                             >
-                                                <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                                <span className="font-medium text-gray-700 group-hover:text-blue-600 transition-colors">
                                                     {child.name}
-                                                </h3>
-                                                {child.description && (
-                                                    <p className="mt-1 text-sm text-gray-500 line-clamp-2">
-                                                        {child.description}
-                                                    </p>
-                                                )}
+                                                </span>
+                                                <svg className="w-4 h-4 text-gray-400 group-hover:text-blue-500 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                </svg>
                                             </Link>
                                         ))}
                                     </div>
@@ -148,7 +146,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                             {/* Other Categories */}
                             <section>
                                 <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-100 pb-2">
-                                    Explorer
+                                    More Topics
                                 </h2>
                                 <div className="flex flex-wrap gap-2">
                                     {allCategories
