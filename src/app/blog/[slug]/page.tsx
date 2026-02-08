@@ -8,6 +8,8 @@ import ImageLightbox from "@/components/ImageLightbox";
 import RichTextContent from "@/components/RichTextContent";
 import MoreArticles from "@/components/MoreArticles";
 import { Header, Footer } from "@/components/Layout";
+import Mermaid from "@/components/Mermaid";
+import PlantUML from "@/components/PlantUML";
 
 export const revalidate = 60;
 
@@ -252,7 +254,7 @@ export default async function ArticlePage({ params }: PageProps) {
 function BlockRenderer({ block }: { block: ContentBlock }) {
     switch (block.__component) {
         case 'blocks.rich-text':
-            return <RichTextContent html={formatContent(block.content)} />;
+            return <RichTextContent content={block.content} />;
 
         case 'blocks.image':
             const imageUrl = getImageUrl(block.image, 'large');
@@ -267,6 +269,29 @@ function BlockRenderer({ block }: { block: ContentBlock }) {
             );
 
         case 'blocks.code-block':
+            // Check if it's mermaid or plantuml, otherwise render standard code block
+            // Actually, code-block component in Strapi might be separate from rich text code blocks.
+            // If the user wants mermaid/plantuml in code blocks, they should use rich text or we handle it here.
+            // For now, render standard code block, but if language is mermaid/plantuml, maybe render diagram?
+            // The request was "mention in blog that anything it should pick up automatically".
+            // If they use standard markdown code blocks, they are inside rich-text.
+            // If they use the dedicated "Code Block" component in Strapi, we handle it here.
+
+            if (block.language === 'mermaid') {
+                return (
+                    <div className="my-6">
+                        <Mermaid chart={block.code} />
+                    </div>
+                );
+            }
+            if (block.language === 'plantuml' || block.language === 'puml') {
+                return (
+                    <div className="my-6">
+                        <PlantUML puml={block.code} />
+                    </div>
+                );
+            }
+
             return (
                 <div className="my-6">
                     <pre className="bg-gray-100 p-4 overflow-x-auto border border-gray-200 rounded-lg">
@@ -283,94 +308,4 @@ function BlockRenderer({ block }: { block: ContentBlock }) {
         default:
             return null;
     }
-}
-
-function formatContent(content: string): string {
-    if (!content) return "";
-
-    const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_API_URL || '';
-
-    // Helper to fix image URLs
-    const fixImageUrl = (url: string): string => {
-        if (!url) return url;
-        // Replace localhost URLs with production Strapi URL
-        if (url.includes('localhost:1337')) {
-            return url.replace(/http:\/\/localhost:1337/g, strapiUrl);
-        }
-        // Already absolute URL (not localhost)
-        if (url.startsWith('http://') || url.startsWith('https://')) return url;
-        // Relative path starting with /
-        if (url.startsWith('/')) return `${strapiUrl}${url}`;
-        // Just filename - assume it's in /uploads/
-        return `${strapiUrl}/uploads/${url}`;
-    };
-
-    // Helper to clean alt text (remove file extension, clean up formatting)
-    const cleanAltText = (alt: string): string => {
-        if (!alt) return '';
-        // Remove file extension
-        return alt
-            .replace(/\.(png|jpg|jpeg|gif|webp)$/i, '')
-            .replace(/[-_]/g, ' ')
-            .replace(/\s+/g, ' ')
-            .trim();
-    };
-
-    return content
-        // Images with markdown format ![alt](url)
-        .replace(/!\[(.*?)\]\s*\((.*?)\)/g, (match, alt, url) => {
-            const fixedUrl = fixImageUrl(url);
-            const cleanedAlt = cleanAltText(alt);
-            return `<figure class="my-6 relative hover:z-10"><img src="${fixedUrl}" alt="${cleanedAlt}" class="w-full rounded-lg transition-transform duration-300 hover:scale-150 cursor-zoom-in shadow-sm hover:shadow-xl" loading="lazy" /></figure>`;
-        })
-        // Standalone image filenames (filename.png or filename.jpg on their own line)
-        .replace(/^([A-Za-z0-9_\-\s]+\.(png|jpg|jpeg|gif|webp))$/gm, (match, filename) => {
-            const fixedUrl = `${strapiUrl}/uploads/${filename}`;
-            return `<figure class="my-6 relative hover:z-10"><img src="${fixedUrl}" alt="" class="w-full rounded-lg transition-transform duration-300 hover:scale-150 cursor-zoom-in shadow-sm hover:shadow-xl" loading="lazy" /></figure>`;
-        })
-        // Links (must come after images) - handle optional space and fix localhost URLs
-        .replace(/\[(.*?)\]\s*\((.*?)\)/g, (match, text, url) => {
-            let fixedUrl = url;
-            if (url.includes('localhost:3000')) {
-                const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
-                fixedUrl = url.replace(/http:\/\/localhost:3000/g, siteUrl);
-            }
-            return `<a href="${fixedUrl}" class="text-blue-600 underline hover:text-blue-800">${text}</a>`;
-        })
-        // Headers
-        .replace(/^### (.*$)/gm, '<h3 class="text-xl font-bold text-gray-900 mt-8 mb-4">$1</h3>')
-        .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">$1</h2>')
-        .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold text-gray-900 mt-10 mb-4">$1</h1>')
-        // Bold
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-        // Italic
-        .replace(/\*(.*?)\*/g, "<em>$1</em>")
-        // Numbered lists
-        .replace(/^\d+\. (.*$)/gm, '<li class="my-1 text-gray-900 leading-snug">$1</li>')
-        // Bullet lists
-        .replace(/^- (.*$)/gm, '<li class="my-1 text-gray-900 leading-snug">$1</li>')
-        // Bullet with •
-        .replace(/^• (.*$)/gm, '<li class="my-1 text-gray-900 leading-snug">$1</li>')
-        // Paragraphs
-        .split("\n\n")
-        .map((p) => {
-            if (p.startsWith("<h") || p.startsWith("<li")) return p;
-            if (p.startsWith("<figure")) {
-                const figureEndIndex = p.lastIndexOf("</figure>") + 9;
-                if (figureEndIndex < p.length) {
-                    const figurePart = p.substring(0, figureEndIndex);
-                    const textPart = p.substring(figureEndIndex).trim();
-                    if (textPart) {
-                        return `${figurePart}<p class="text-gray-900 leading-relaxed mb-4 mt-4">${textPart.replace(/\n/g, '<br/>')}</p>`;
-                    }
-                }
-                return p;
-            }
-            if (p.includes("<li>")) return `<ul class="list-disc pl-6 my-2 text-gray-900 last:mb-0">${p}</ul>`;
-            if (p.trim() === "") return "";
-            // Convert single newlines to <br> and wrap in paragraph
-            const withBreaks = p.replace(/\n/g, '<br/>');
-            return `<p class="text-gray-900 leading-relaxed mb-4">${withBreaks}</p>`;
-        })
-        .join("\n");
 }
