@@ -321,12 +321,12 @@ function formatContent(content: string): string {
         .replace(/!\[(.*?)\]\s*\((.*?)\)/g, (match, alt, url) => {
             const fixedUrl = fixImageUrl(url);
             const cleanedAlt = cleanAltText(alt);
-            return `<figure class="my-6 relative hover:z-10"><img src="${fixedUrl}" alt="${cleanedAlt}" class="w-full rounded-lg transition-transform duration-300 hover:scale-110 cursor-zoom-in shadow-sm hover:shadow-xl" loading="lazy" /></figure>`;
+            return `<figure class="my-6 relative hover:z-10"><img src="${fixedUrl}" alt="${cleanedAlt}" class="w-full rounded-lg transition-transform duration-300 hover:scale-150 cursor-zoom-in shadow-sm hover:shadow-xl" loading="lazy" /></figure>`;
         })
         // Standalone image filenames (filename.png or filename.jpg on their own line)
         .replace(/^([A-Za-z0-9_\-\s]+\.(png|jpg|jpeg|gif|webp))$/gm, (match, filename) => {
             const fixedUrl = `${strapiUrl}/uploads/${filename}`;
-            return `<figure class="my-6 relative hover:z-10"><img src="${fixedUrl}" alt="" class="w-full rounded-lg transition-transform duration-300 hover:scale-110 cursor-zoom-in shadow-sm hover:shadow-xl" loading="lazy" /></figure>`;
+            return `<figure class="my-6 relative hover:z-10"><img src="${fixedUrl}" alt="" class="w-full rounded-lg transition-transform duration-300 hover:scale-150 cursor-zoom-in shadow-sm hover:shadow-xl" loading="lazy" /></figure>`;
         })
         // Links (must come after images) - handle optional space and fix localhost URLs
         .replace(/\[(.*?)\]\s*\((.*?)\)/g, (match, text, url) => {
