@@ -290,13 +290,28 @@ function formatContent(content: string): string {
 
     const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_API_URL || '';
 
+    // Helper to fix image URLs
+    const fixImageUrl = (url: string): string => {
+        if (!url) return url;
+        // Already absolute URL
+        if (url.startsWith('http://') || url.startsWith('https://')) return url;
+        // Relative path starting with /
+        if (url.startsWith('/')) return `${strapiUrl}${url}`;
+        // Just filename - assume it's in /uploads/
+        return `${strapiUrl}/uploads/${url}`;
+    };
+
     return content
-        // Images with optional space between ] and ( - prepend Strapi URL for relative paths
-        .replace(/!\[(.*?)\]\s*\((\/uploads\/.*?)\)/g, `<figure class="my-6"><img src="${strapiUrl}$2" alt="$1" class="w-full" loading="lazy" /><figcaption class="mt-2 text-center text-sm text-gray-500 italic">$1</figcaption></figure>`)
-        // Images with full URLs (keep as is)
-        .replace(/!\[(.*?)\]\s*\((https?:\/\/.*?)\)/g, '<figure class="my-6"><img src="$2" alt="$1" class="w-full" loading="lazy" /><figcaption class="mt-2 text-center text-sm text-gray-500 italic">$1</figcaption></figure>')
+        // Images with markdown format ![alt](url)
+        .replace(/!\[(.*?)\]\s*\((.*?)\)/g, (match, alt, url) => {
+            const fixedUrl = fixImageUrl(url);
+            return `<figure class="my-6"><img src="${fixedUrl}" alt="${alt}" class="w-full" loading="lazy" /><figcaption class="mt-2 text-center text-sm text-gray-500 italic">${alt}</figcaption></figure>`;
+        })
         // Standalone image filenames (filename.png or filename.jpg on their own line)
-        .replace(/^([A-Za-z0-9_\-\s]+\.(png|jpg|jpeg|gif|webp))$/gm, '<figure class="my-6 text-center text-sm text-gray-400 italic">[$1]</figure>')
+        .replace(/^([A-Za-z0-9_\-\s]+\.(png|jpg|jpeg|gif|webp))$/gm, (match, filename) => {
+            const fixedUrl = `${strapiUrl}/uploads/${filename}`;
+            return `<figure class="my-6"><img src="${fixedUrl}" alt="${filename}" class="w-full" loading="lazy" /><figcaption class="mt-2 text-center text-sm text-gray-500 italic">${filename}</figcaption></figure>`;
+        })
         // Links (must come after images) - handle optional space
         .replace(/\[(.*?)\]\s*\((.*?)\)/g, '<a href="$2" class="text-blue-600 underline hover:text-blue-800" target="_blank" rel="noopener noreferrer">$1</a>')
         // Headers
