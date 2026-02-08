@@ -346,18 +346,20 @@ function formatContent(content: string): string {
         // Italic
         .replace(/\*(.*?)\*/g, "<em>$1</em>")
         // Numbered lists
-        .replace(/^\d+\. (.*$)/gm, '<li class="mb-2 text-gray-800">$1</li>')
+        .replace(/^\d+\. (.*$)/gm, '<li class="mb-2 text-gray-900">$1</li>')
         // Bullet lists
-        .replace(/^- (.*$)/gm, '<li class="mb-2 text-gray-800">$1</li>')
+        .replace(/^- (.*$)/gm, '<li class="mb-2 text-gray-900">$1</li>')
         // Bullet with •
-        .replace(/^• (.*$)/gm, '<li class="mb-2 text-gray-800">$1</li>')
+        .replace(/^• (.*$)/gm, '<li class="mb-2 text-gray-900">$1</li>')
         // Paragraphs
         .split("\n\n")
         .map((p) => {
             if (p.startsWith("<h") || p.startsWith("<li") || p.startsWith("<figure")) return p;
-            if (p.includes("<li>")) return `<ul class="list-disc pl-6 my-4 text-gray-800">${p}</ul>`;
+            if (p.includes("<li>")) return `<ul class="list-disc pl-6 my-4 text-gray-900">${p}</ul>`;
             if (p.trim() === "") return "";
-            return `<p class="text-gray-800 leading-relaxed mb-4">${p}</p>`;
+            // Convert single newlines to <br> and wrap in paragraph
+            const withBreaks = p.replace(/\n/g, '<br/>');
+            return `<p class="text-gray-900 leading-relaxed mb-4">${withBreaks}</p>`;
         })
         .join("\n");
 }
