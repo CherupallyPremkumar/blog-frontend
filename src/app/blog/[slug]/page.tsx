@@ -11,7 +11,7 @@ import { PageLayout } from "@/components/Layout";
 import Mermaid from "@/components/Mermaid";
 import PlantUML from "@/components/PlantUML";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 // Generate static params for SSG
 export async function generateStaticParams() {

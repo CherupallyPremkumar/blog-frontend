@@ -228,7 +228,7 @@ function buildCategoryTree(categories: Category[]): Category[] {
  */
 export async function getCategories(tree: boolean = false): Promise<Category[]> {
     const response = await fetchAPI<Category[]>('/api/categories?populate=*&sort=order:asc&pagination[pageSize]=100', {
-        cache: 'no-store'
+        next: { revalidate: 3600 }
     });
     const categories = response.data;
 
