@@ -305,11 +305,23 @@ function formatContent(content: string): string {
         return `${strapiUrl}/uploads/${url}`;
     };
 
+    // Helper to clean alt text (remove file extension, clean up formatting)
+    const cleanAltText = (alt: string): string => {
+        if (!alt) return '';
+        // Remove file extension
+        return alt
+            .replace(/\.(png|jpg|jpeg|gif|webp)$/i, '')
+            .replace(/[-_]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    };
+
     return content
         // Images with markdown format ![alt](url)
         .replace(/!\[(.*?)\]\s*\((.*?)\)/g, (match, alt, url) => {
             const fixedUrl = fixImageUrl(url);
-            return `<figure class="my-6 overflow-hidden rounded-lg"><img src="${fixedUrl}" alt="${alt}" class="w-full transition-transform duration-300 hover:scale-105 cursor-zoom-in" loading="lazy" /></figure>`;
+            const cleanedAlt = cleanAltText(alt);
+            return `<figure class="my-6 overflow-hidden rounded-lg"><img src="${fixedUrl}" alt="${cleanedAlt}" class="w-full transition-transform duration-300 hover:scale-105 cursor-zoom-in" loading="lazy" /></figure>`;
         })
         // Standalone image filenames (filename.png or filename.jpg on their own line)
         .replace(/^([A-Za-z0-9_\-\s]+\.(png|jpg|jpeg|gif|webp))$/gm, (match, filename) => {
