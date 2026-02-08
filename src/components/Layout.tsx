@@ -50,8 +50,8 @@ export async function Header({ showBackLink = false }: HeaderProps) {
             {categories.length > 0 && (
                 <div className="border-t border-gray-200">
                     <div className="mx-auto max-w-6xl px-6">
-                        <nav className="flex items-center gap-6 overflow-x-auto py-3 no-scrollbar">
-                            {categories.slice(0, 7).map((category) => (
+                        <nav className="flex items-center gap-6 overflow-x-auto py-3 no-scrollbar relative">
+                            {categories.slice(0, 5).map((category) => (
                                 <Link
                                     key={category.documentId}
                                     href={`/category/${category.slug}`}
@@ -60,10 +60,10 @@ export async function Header({ showBackLink = false }: HeaderProps) {
                                     {category.name}
                                 </Link>
                             ))}
-                            {categories.length > 7 && (
+                            {categories.length > 5 && (
                                 <Link
                                     href="/categories"
-                                    className="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors whitespace-nowrap flex items-center gap-1"
+                                    className="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors whitespace-nowrap flex items-center gap-1 ml-auto"
                                 >
                                     More
                                     <span className="text-xs">→</span>
@@ -110,7 +110,7 @@ export function PageLayout({
     return (
         <div className="min-h-screen bg-white flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
             <Header showBackLink={showBackLink} />
-            <main className={`${maxWidthClass} mx-auto w-full flex-1 px-6 pt-32 pb-8 md:pt-40`}>
+            <main className={`${maxWidthClass} mx-auto w-full flex-1 px-6 pt-28 pb-8 md:pt-32`}>
                 {children}
             </main>
             <Footer />
