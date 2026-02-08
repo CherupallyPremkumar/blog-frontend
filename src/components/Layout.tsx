@@ -51,7 +51,7 @@ export async function Header({ showBackLink = false }: HeaderProps) {
                 <div className="border-t border-gray-200">
                     <div className="mx-auto max-w-6xl px-6">
                         <nav className="flex items-center gap-6 overflow-x-auto py-3 no-scrollbar">
-                            {categories.map((category) => (
+                            {categories.slice(0, 7).map((category) => (
                                 <Link
                                     key={category.documentId}
                                     href={`/category/${category.slug}`}
@@ -60,6 +60,15 @@ export async function Header({ showBackLink = false }: HeaderProps) {
                                     {category.name}
                                 </Link>
                             ))}
+                            {categories.length > 7 && (
+                                <Link
+                                    href="/categories"
+                                    className="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors whitespace-nowrap flex items-center gap-1"
+                                >
+                                    More
+                                    <span className="text-xs">→</span>
+                                </Link>
+                            )}
                         </nav>
                     </div>
                 </div>
