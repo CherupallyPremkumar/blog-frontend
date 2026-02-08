@@ -145,7 +145,7 @@ export default async function ArticlePage({ params }: PageProps) {
                 <Header showBackLink />
 
                 {/* Two Column Layout */}
-                <div className="max-w-6xl mx-auto px-6 py-10 pt-32 flex gap-8 flex-1">
+                <div className="max-w-6xl mx-auto px-6 py-10 pt-8 flex gap-8 flex-1">
                     {/* Article - Scrollable */}
                     <article id="main-content" className="flex-1 min-w-0">
                         {/* Meta */}
