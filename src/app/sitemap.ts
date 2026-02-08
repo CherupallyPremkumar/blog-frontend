@@ -6,7 +6,7 @@ import { getArticles } from '@/lib/api';
  * This helps search engines discover and index all pages
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ioclick.me';
 
     // Static routes
     const staticRoutes: MetadataRoute.Sitemap = [

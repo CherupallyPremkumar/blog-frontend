@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 // Get Strapi URL from environment
-const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_API_URL || 'http://localhost:1337';
+const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_API_URL || 'https://api.ioclick.me';
 const strapiHostname = new URL(strapiUrl).hostname;
 const strapiPort = new URL(strapiUrl).port || '';
 const strapiProtocol = new URL(strapiUrl).protocol.replace(':', '') as 'http' | 'https';

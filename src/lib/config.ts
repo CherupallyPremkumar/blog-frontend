@@ -40,7 +40,7 @@ export const config = {
             'NEXT_PUBLIC_SITE_DESCRIPTION',
             'Documenting my journey in system design & engineering'
         ),
-        url: getOptionalEnvVar('NEXT_PUBLIC_SITE_URL', 'http://localhost:3000'),
+        url: getOptionalEnvVar('NEXT_PUBLIC_SITE_URL', 'https://ioclick.me'),
         author: getOptionalEnvVar('NEXT_PUBLIC_SITE_AUTHOR', 'Prem Kumar'),
     },
 

@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 // Default metadata for the site
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://ioclick.me"),
   title: {
     default: "IOClick",
     template: "%s | IOClick",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://ioclick.me",
     siteName: "IOClick",
     title: "IOClick",
     description: "Documenting my journey in system design & engineering",
@@ -86,8 +86,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* Preconnect to Strapi for faster image loading */}
-        <link rel="preconnect" href={process.env.NEXT_PUBLIC_STRAPI_API_URL || "http://localhost:1337"} />
-        <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_STRAPI_API_URL || "http://localhost:1337"} />
+        <link rel="preconnect" href={process.env.NEXT_PUBLIC_STRAPI_API_URL || "https://api.ioclick.me"} />
+        <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_STRAPI_API_URL || "https://api.ioclick.me"} />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
