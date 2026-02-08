@@ -11,47 +11,20 @@ interface CategoryNavProps {
 export default function CategoryNav({ categories }: CategoryNavProps) {
     const [hiddenCount, setHiddenCount] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
-    const itemRefs = useRef<Map<string, HTMLAnchorElement>>(new Map());
+    const itemRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
     useEffect(() => {
-        if (!containerRef.current) return;
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                let currentHidden = 0;
-                entries.forEach((entry) => {
-                    // entry.isIntersecting is true if the element is visible in the container
-                    if (!entry.isIntersecting) {
-                        currentHidden++;
-                    }
-                });
-
-                // This approach is a bit naive because IntersectionObserver 
-                // tells us what's visible, but we need to know exactly how many 
-                // fit before we hide them.
-                // Let's use a simpler resizing strategy.
-            },
-            {
-                root: containerRef.current,
-                threshold: 1.0,
-            }
-        );
-
-        // Actually, for "Show what fits", a manual width check is more reliable in React.
         const checkOverflow = () => {
             if (!containerRef.current) return;
 
             const container = containerRef.current;
             const containerWidth = container.offsetWidth;
-            const moreButtonWidth = 80; // Approximate width of "More →" button
+            const moreButtonWidth = 80;
 
             let totalWidth = 0;
             let count = 0;
-            let needsMore = false;
 
             const items = Array.from(itemRefs.current.values());
-
-            // First, check if everything fits WITHOUT the more button
             let totalItemsWidth = 0;
             items.forEach(item => {
                 totalItemsWidth += item.offsetWidth + 24; // text + gap-6
@@ -62,11 +35,9 @@ export default function CategoryNav({ categories }: CategoryNavProps) {
                 return;
             }
 
-            // If not, find how many fit WITH the more button
             for (let i = 0; i < items.length; i++) {
                 const itemWidth = items[i].offsetWidth + 24;
                 if (totalWidth + itemWidth + moreButtonWidth > containerWidth) {
-                    needsMore = true;
                     break;
                 }
                 totalWidth += itemWidth;
@@ -80,35 +51,72 @@ export default function CategoryNav({ categories }: CategoryNavProps) {
             checkOverflow();
         });
 
-        resizeObserver.observe(containerRef.current);
+        if (containerRef.current) {
+            resizeObserver.observe(containerRef.current);
+        }
 
-        // Initial check
-        setTimeout(checkOverflow, 0);
+        // Initial check after a short delay for refs to populate
+        const timer = setTimeout(checkOverflow, 100);
 
         return () => {
             resizeObserver.disconnect();
+            clearTimeout(timer);
         };
     }, [categories]);
 
     return (
         <div ref={containerRef} className="flex items-center w-full min-h-[44px]">
             <nav className="flex items-center gap-6 overflow-hidden flex-1">
-                {categories.map((category) => (
-                    <Link
-                        key={category.documentId}
-                        ref={(el) => {
-                            if (el) itemRefs.current.set(category.documentId, el);
-                            else itemRefs.current.delete(category.documentId);
-                        }}
-                        href={`/category/${category.slug}`}
-                        className={`text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors whitespace-nowrap ${hiddenCount > 0 && categories.indexOf(category) >= (categories.length - hiddenCount)
-                                ? 'invisible absolute pointer-events-none'
-                                : 'visible'
-                            }`}
-                    >
-                        {category.name}
-                    </Link>
-                ))}
+                {categories.map((category, index) => {
+                    const isHidden = hiddenCount > 0 && index >= (categories.length - hiddenCount);
+                    const hasChildren = category.children && category.children.length > 0;
+
+                    return (
+                        <div
+                            key={category.documentId}
+                            ref={(el) => {
+                                if (el) itemRefs.current.set(category.documentId, el);
+                                else itemRefs.current.delete(category.documentId);
+                            }}
+                            className={`group relative flex items-center h-full py-3 ${isHidden ? 'invisible absolute pointer-events-none' : 'visible'
+                                }`}
+                        >
+                            <Link
+                                href={`/category/${category.slug}`}
+                                className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors whitespace-nowrap flex items-center gap-1"
+                            >
+                                {category.name}
+                                {hasChildren && (
+                                    <svg
+                                        className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 transition-all group-hover:rotate-180"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                )}
+                            </Link>
+
+                            {/* Dropdown Menu */}
+                            {hasChildren && (
+                                <div className="absolute top-full left-0 mt-0 pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-[60]">
+                                    <div className="w-48 bg-white/95 backdrop-blur-xl rounded-xl border border-gray-100 shadow-xl overflow-hidden py-1">
+                                        {category.children!.map((child) => (
+                                            <Link
+                                                key={child.documentId}
+                                                href={`/category/${child.slug}`}
+                                                className="block px-4 py-2.5 text-sm text-gray-600 hover:text-blue-600 hover:bg-gray-50/50 transition-colors font-medium"
+                                            >
+                                                {child.name}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
             </nav>
             {hiddenCount > 0 && (
                 <Link
@@ -122,3 +130,4 @@ export default function CategoryNav({ categories }: CategoryNavProps) {
         </div>
     );
 }
+

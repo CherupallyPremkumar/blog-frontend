@@ -38,91 +38,142 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 export default async function CategoryPage({ params }: CategoryPageProps) {
     const { slug } = await params;
 
-    let category;
-    let articles = [];
-
     try {
-        const categories = await getCategories();
-        category = categories.find((c) => c.slug === slug);
+        // Find this category and its parent/children
+        const allCategories = await getCategories(true);
+
+        // Recursive find to handle nesting
+        const findCategory = (cats: Category[], slug: string): Category | undefined => {
+            for (const cat of cats) {
+                if (cat.slug === slug) return cat;
+                if (cat.children && cat.children.length > 0) {
+                    const found = findCategory(cat.children, slug);
+                    if (found) return found;
+                }
+            }
+        };
+
+        const category = findCategory(allCategories, slug);
 
         if (!category) {
             notFound();
         }
 
-        articles = await getArticlesByCategory(slug);
-
-        // Get other categories for "Related" section
-        const otherCategories = categories
-            .filter(c => c.slug !== slug)
-            .sort(() => 0.5 - Math.random())
-            .slice(0, 4);
+        const articles = await getArticlesByCategory(slug);
 
         return (
-            <PageLayout showBackLink>
-                <div className="mb-10 border-b border-gray-100 pb-8">
-                    <div className="flex items-center justify-between mb-4">
-                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-                            {category.name}
-                        </h1>
-                        <span className="text-sm font-medium px-3 py-1 bg-gray-100 text-blue-600 rounded-full">
-                            {articles.length} {articles.length === 1 ? 'article' : 'articles'}
-                        </span>
-                    </div>
-                    {category.description && (
-                        <p className="text-lg text-gray-500 max-w-2xl leading-relaxed">
-                            {category.description}
-                        </p>
-                    )}
-                </div>
-
-                {articles.length === 0 ? (
-                    <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                        <p className="text-gray-500 font-medium">No articles found in this category yet.</p>
-                        <Link
-                            href="/categories"
-                            className="mt-4 inline-block text-blue-600 font-bold hover:underline"
-                        >
-                            Explore other categories →
-                        </Link>
-                    </div>
-                ) : (
-                    <>
-                        <Timeline articles={articles} />
-
-                        {/* Other Categories Section */}
-                        {otherCategories.length > 0 && (
-                            <div className="mt-20 pt-12 border-t border-gray-100">
-                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-8">
-                                    Explore More Topics
-                                </h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {otherCategories.map((other) => (
-                                        <Link
-                                            key={other.documentId}
-                                            href={`/category/${other.slug}`}
-                                            className="p-4 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all group"
-                                        >
-                                            <div className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                                                {other.name}
-                                            </div>
-                                            {other.description && (
-                                                <p className="text-xs text-gray-500 mt-1 line-clamp-1">
-                                                    {other.description}
-                                                </p>
-                                            )}
-                                        </Link>
-                                    ))}
+            <PageLayout maxWidth="wide">
+                <div className="pt-2 pb-12">
+                    {/* Header Section */}
+                    <div className="mb-10">
+                        <nav className="mb-6 flex items-center gap-2 text-sm text-gray-500">
+                            <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
+                            <span className="opacity-30">/</span>
+                            <Link href="/categories" className="hover:text-blue-600 transition-colors">Categories</Link>
+                            {category.parent && (
+                                <>
+                                    <span className="opacity-30">/</span>
                                     <Link
-                                        href="/categories"
-                                        className="p-4 rounded-xl border border-dashed border-gray-200 hover:border-blue-200 hover:bg-gray-50 flex items-center justify-center font-bold text-blue-600 text-sm"
+                                        href={`/category/${category.parent.slug}`}
+                                        className="hover:text-blue-600 transition-colors"
                                     >
-                                        View All Categories →
+                                        {category.parent.name}
+                                    </Link>
+                                </>
+                            )}
+                            <span className="opacity-30">/</span>
+                            <span className="text-gray-900 font-medium">{category.name}</span>
+                        </nav>
+
+                        <div className="relative">
+                            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
+                                {category.name}
+                            </h1>
+                            {category.description && (
+                                <p className="text-xl text-gray-600 max-w-3xl leading-relaxed">
+                                    {category.description}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                        {/* Main Content */}
+                        <div className="lg:col-span-8">
+                            <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-8 border-b border-gray-100 pb-2">Articles</h2>
+
+                            {articles.length > 0 ? (
+                                <div className="pb-20">
+                                    <Timeline articles={articles} />
+                                </div>
+                            ) : (
+                                <div className="py-20 text-center rounded-3xl bg-gray-50/50 border border-dashed border-gray-200">
+                                    <p className="text-gray-500">No articles found in this category yet.</p>
+                                    <Link href="/" className="inline-block mt-4 text-blue-600 font-medium hover:underline">
+                                        Back to Home
                                     </Link>
                                 </div>
-                            </div>
-                        )}
-                    </>
-                )}
+                            )}
+                        </div>
+
+                        {/* Sidebar */}
+                        <div className="lg:col-span-4 space-y-12">
+                            {/* Sub-categories */}
+                            {category.children && category.children.length > 0 && (
+                                <section>
+                                    <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-100 pb-2">
+                                        Sub-topics
+                                    </h2>
+                                    <div className="grid grid-cols-1 gap-4">
+                                        {category.children.map((child: Category) => (
+                                            <Link
+                                                key={child.documentId}
+                                                href={`/category/${child.slug}`}
+                                                className="group p-5 rounded-2xl bg-gray-50 border border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-300"
+                                            >
+                                                <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                                    {child.name}
+                                                </h3>
+                                                {child.description && (
+                                                    <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+                                                        {child.description}
+                                                    </p>
+                                                )}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Other Categories */}
+                            <section>
+                                <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-100 pb-2">
+                                    Explorer
+                                </h2>
+                                <div className="flex flex-wrap gap-2">
+                                    {allCategories
+                                        .filter(c => c.slug !== slug && !c.parent)
+                                        .slice(0, 8)
+                                        .map((cat) => (
+                                            <Link
+                                                key={cat.documentId}
+                                                href={`/category/${cat.slug}`}
+                                                className="px-4 py-2 rounded-full bg-white border border-gray-200 text-sm font-medium text-gray-600 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300"
+                                            >
+                                                {cat.name}
+                                            </Link>
+                                        ))}
+                                </div>
+                                <Link
+                                    href="/categories"
+                                    className="inline-block mt-6 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
+                                >
+                                    View All Categories →
+                                </Link>
+                            </section>
+                        </div>
+                    </div>
+                </div>
             </PageLayout>
         );
     } catch (error) {

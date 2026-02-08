@@ -133,7 +133,7 @@ export default async function ArticlePage({ params }: PageProps) {
     };
 
     return (
-        <PageLayout showBackLink maxWidth="wide">
+        <PageLayout maxWidth="wide">
             {/* JSON-LD Structured Data */}
             <script
                 type="application/ld+json"
@@ -144,6 +144,37 @@ export default async function ArticlePage({ params }: PageProps) {
             <div className="flex gap-8 flex-1">
                 {/* Article - Scrollable */}
                 <article id="main-content" className="flex-1 min-w-0">
+                    {/* Breadcrumbs */}
+                    <nav className="mb-6 flex items-center gap-2 text-sm text-gray-500 overflow-x-auto whitespace-nowrap pb-2 scrollbar-none">
+                        <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
+                        <span className="opacity-30">/</span>
+                        <Link href="/categories" className="hover:text-blue-600 transition-colors">Categories</Link>
+                        {article.category?.parent && (
+                            <>
+                                <span className="opacity-30">/</span>
+                                <Link
+                                    href={`/category/${article.category.parent.slug}`}
+                                    className="hover:text-blue-600 transition-colors"
+                                >
+                                    {article.category.parent.name}
+                                </Link>
+                            </>
+                        )}
+                        {article.category && (
+                            <>
+                                <span className="opacity-30">/</span>
+                                <Link
+                                    href={`/category/${article.category.slug}`}
+                                    className="hover:text-blue-600 transition-colors"
+                                >
+                                    {article.category.name}
+                                </Link>
+                            </>
+                        )}
+                        <span className="opacity-30">/</span>
+                        <span className="text-gray-900 font-medium truncate">{article.title}</span>
+                    </nav>
+
                     {/* Meta */}
                     <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
                         {article.category && (

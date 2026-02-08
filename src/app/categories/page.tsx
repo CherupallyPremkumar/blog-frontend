@@ -25,7 +25,7 @@ export default async function CategoriesPage() {
     );
 
     return (
-        <PageLayout showBackLink>
+        <PageLayout>
             <div className="mb-12 border-b border-gray-100 pb-8">
                 <h1 className="text-4xl font-bold text-gray-900 tracking-tight mb-4">
                     Categories

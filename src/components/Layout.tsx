@@ -5,12 +5,10 @@ import { getCategories } from "@/lib/api";
 import CategoryNav from "./CategoryNav";
 
 // Shared header component
-interface HeaderProps {
-    showBackLink?: boolean;
-}
+import HeaderContent from "./header/HeaderContent";
 
-export async function Header({ showBackLink = false }: HeaderProps) {
-    const categories = await getCategories();
+export async function Header() {
+    const categories = await getCategories(true);
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-gray-200/50 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60">
@@ -29,22 +27,12 @@ export async function Header({ showBackLink = false }: HeaderProps) {
                         </span>
                     </Link>
 
-                    {!showBackLink && (
-                        <p className="hidden text-sm font-medium text-gray-500 sm:block border-l border-gray-200 pl-4 py-1">
-                            {config.site.description}
-                        </p>
-                    )}
+                    <p className="hidden text-sm font-medium text-gray-500 sm:block border-l border-gray-200 pl-4 py-1">
+                        {config.site.description}
+                    </p>
                 </div>
 
-                {showBackLink && (
-                    <Link
-                        href="/"
-                        className="group flex items-center gap-1.5 rounded-full bg-gray-100/50 px-4 py-1.5 text-sm font-medium text-gray-600 transition-all hover:bg-gray-100 hover:text-gray-900"
-                    >
-                        <span className="transition-transform group-hover:-translate-x-0.5">←</span>
-                        Back to Timeline
-                    </Link>
-                )}
+                <HeaderContent />
             </div>
 
             {/* Category Navigation */}
@@ -55,6 +43,31 @@ export async function Header({ showBackLink = false }: HeaderProps) {
                     </div>
                 </div>
             )}
+        </header>
+    );
+}
+
+/**
+ * Header Skeleton for loading states
+ */
+export function HeaderSkeleton() {
+    return (
+        <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-gray-200/50 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60">
+            <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+                <div className="flex items-center gap-8">
+                    <div className="flex items-center gap-2.5">
+                        <div className="h-8 w-8 rounded-lg bg-gray-200 animate-pulse" />
+                        <div className="h-6 w-24 bg-gray-200 rounded animate-pulse" />
+                    </div>
+                </div>
+            </div>
+            <div className="border-t border-gray-100">
+                <div className="mx-auto max-w-6xl px-6 h-[44px] flex items-center gap-6">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                        <div key={i} className="h-4 w-16 bg-gray-100 rounded animate-pulse" />
+                    ))}
+                </div>
+            </div>
         </header>
     );
 }
@@ -78,21 +91,18 @@ export function Footer({ }: FooterProps) {
 
 interface PageLayoutProps {
     children: React.ReactNode;
-    showBackLink?: boolean;
     maxWidth?: 'default' | 'wide';
 }
 
 export function PageLayout({
     children,
-    showBackLink = false,
     maxWidth = 'default'
 }: PageLayoutProps) {
     const maxWidthClass = maxWidth === 'wide' ? 'max-w-6xl' : 'max-w-4xl';
 
     return (
         <div className="min-h-screen bg-white flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
-            <Header showBackLink={showBackLink} />
-            <main className={`${maxWidthClass} mx-auto w-full flex-1 px-6 pt-28 pb-8 md:pt-32`}>
+            <main className={`${maxWidthClass} mx-auto w-full flex-1 px-4 md:px-6 pt-24 md:pt-28 pb-8`}>
                 {children}
             </main>
             <Footer />

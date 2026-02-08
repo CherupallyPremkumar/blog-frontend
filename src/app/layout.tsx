@@ -1,6 +1,7 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { SkipToContent } from "@/components/Layout";
+import { SkipToContent, Header, HeaderSkeleton } from "@/components/Layout";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -101,6 +102,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SkipToContent />
+        <Header />
         {children}
       </body>
     </html>

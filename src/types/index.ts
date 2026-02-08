@@ -66,6 +66,8 @@ export interface Category {
     slug: string;
     description: string | null;
     order: number;
+    parent?: Category;
+    children?: Category[];
     createdAt: string;
 }
 

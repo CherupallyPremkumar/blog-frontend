@@ -160,7 +160,7 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
     }
 
     const response = await fetchAPI<Article[]>(
-        `/api/articles?filters[slug][$eq]=${encodeURIComponent(slug)}&populate=*`
+        `/api/articles?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[category][populate]=parent&populate[author][populate]=avatar&populate[coverImage]=*&populate[blocks][populate]=*`
     );
 
     const article = response.data[0] || null;
@@ -184,9 +184,58 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
 /**
  * Get all categories
  */
-export async function getCategories(): Promise<Category[]> {
-    const response = await fetchAPI<Category[]>('/api/categories?populate=*&sort=order:asc');
-    return response.data;
+/**
+ * Build a recursive tree from flat categories
+ */
+function buildCategoryTree(categories: Category[]): Category[] {
+    const map = new Map<string, Category & { children: Category[] }>();
+    const roots: Category[] = [];
+
+    // Initialize map with empty children arrays
+    categories.forEach(cat => {
+        map.set(cat.documentId, { ...cat, children: [] });
+    });
+
+    categories.forEach(cat => {
+        const node = map.get(cat.documentId)!;
+        // Check if this category has a parent in our collection
+        const parentId = (cat as any).parent?.documentId;
+
+        if (parentId && map.has(parentId)) {
+            map.get(parentId)!.children.push(node);
+        } else {
+            roots.push(node);
+        }
+    });
+
+    // Recursively sort all levels by the order field
+    const sortCategories = (nodes: any[]) => {
+        nodes.sort((a, b) => (a.order || 0) - (b.order || 0));
+        nodes.forEach(node => {
+            if (node.children && node.children.length > 0) {
+                sortCategories(node.children);
+            }
+        });
+    };
+
+    sortCategories(roots);
+    return roots;
+}
+
+/**
+ * Get all categories organized as a tree
+ */
+export async function getCategories(tree: boolean = false): Promise<Category[]> {
+    const response = await fetchAPI<Category[]>('/api/categories?populate=*&sort=order:asc&pagination[pageSize]=100', {
+        next: { revalidate: 3600 }
+    });
+    const categories = response.data;
+
+    if (tree) {
+        return buildCategoryTree(categories);
+    }
+
+    return categories;
 }
 
 /**
