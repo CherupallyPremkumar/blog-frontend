@@ -146,7 +146,7 @@ async function fetchAPI<T>(
  * Get all published articles, sorted by order field
  */
 export async function getArticles(): Promise<Article[]> {
-    const response = await fetchAPI<Article[]>('/api/articles?populate=*&sort=order:asc');
+    const response = await fetchAPI<Article[]>('/api/articles?populate[0]=*&sort=order:asc');
     return response.data;
 }
 
@@ -160,7 +160,7 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
     }
 
     const response = await fetchAPI<Article[]>(
-        `/api/articles?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[category][populate]=parent&populate[author][populate]=avatar&populate[coverImage]=*&populate[blocks][populate]=*`
+        `/api/articles?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[category][populate]=parent&populate[author][populate]=avatar&populate[coverImage]=true&populate[blocks][populate]=*`
     );
 
     const article = response.data[0] || null;
