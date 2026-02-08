@@ -7,7 +7,7 @@ import { config } from "@/lib/config";
 import ImageLightbox from "@/components/ImageLightbox";
 import RichTextContent from "@/components/RichTextContent";
 import MoreArticles from "@/components/MoreArticles";
-import { Header, Footer } from "@/components/Layout";
+import { PageLayout } from "@/components/Layout";
 import Mermaid from "@/components/Mermaid";
 import PlantUML from "@/components/PlantUML";
 
@@ -133,121 +133,113 @@ export default async function ArticlePage({ params }: PageProps) {
     };
 
     return (
-        <>
+        <PageLayout showBackLink maxWidth="wide">
             {/* JSON-LD Structured Data */}
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
 
-            <div className="min-h-screen bg-white flex flex-col">
-                {/* Header */}
-                <Header showBackLink />
-
-                {/* Two Column Layout */}
-                <div className="max-w-6xl mx-auto px-6 py-10 pt-8 flex gap-8 flex-1">
-                    {/* Article - Scrollable */}
-                    <article id="main-content" className="flex-1 min-w-0">
-                        {/* Meta */}
-                        <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
-                            {article.category && (
-                                <span className="uppercase text-xs tracking-wide">
-                                    {article.category.name}
-                                </span>
-                            )}
-                            {article.category && article.publishedAt && <span aria-hidden="true">•</span>}
-                            {article.publishedAt && (
-                                <time dateTime={article.publishedAt}>
-                                    {new Date(article.publishedAt).toLocaleDateString("en-US", {
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                    })}
-                                </time>
-                            )}
-                        </div>
-
-                        {/* Title */}
-                        <h1 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
-                            {article.title}
-                        </h1>
-
-                        {/* Author */}
-                        {article.author && (
-                            <div className="flex items-center gap-3 mb-8 pb-8 border-b border-gray-200">
-                                <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-sm font-medium text-gray-600 overflow-hidden">
-                                    {article.author.avatar ? (
-                                        <Image
-                                            src={getImageUrl(article.author.avatar, 'thumbnail') || ''}
-                                            alt={article.author.name}
-                                            width={40}
-                                            height={40}
-                                            className="object-cover"
-                                        />
-                                    ) : (
-                                        <span aria-hidden="true">{article.author.name?.charAt(0) || "?"}</span>
-                                    )}
-                                </div>
-                                <div>
-                                    <p className="font-medium text-gray-900">
-                                        {article.author.name}
-                                    </p>
-                                    {article.author.bio && (
-                                        <p className="text-sm text-gray-500">
-                                            {article.author.bio}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
+            {/* Two Column Layout */}
+            <div className="flex gap-8 flex-1">
+                {/* Article - Scrollable */}
+                <article id="main-content" className="flex-1 min-w-0">
+                    {/* Meta */}
+                    <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
+                        {article.category && (
+                            <span className="uppercase text-xs tracking-wide">
+                                {article.category.name}
+                            </span>
                         )}
+                        {article.category && article.publishedAt && <span aria-hidden="true">•</span>}
+                        {article.publishedAt && (
+                            <time dateTime={article.publishedAt}>
+                                {new Date(article.publishedAt).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                })}
+                            </time>
+                        )}
+                    </div>
 
-                        {/* Cover Image */}
-                        {coverUrl && (
-                            <figure className="mb-8">
-                                <div className="relative w-full aspect-video bg-gray-100">
+                    {/* Title */}
+                    <h1 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
+                        {article.title}
+                    </h1>
+
+                    {/* Author */}
+                    {article.author && (
+                        <div className="flex items-center gap-3 mb-8 pb-8 border-b border-gray-200">
+                            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-sm font-medium text-gray-600 overflow-hidden">
+                                {article.author.avatar ? (
                                     <Image
-                                        src={coverUrl}
-                                        alt={article.coverImage?.alternativeText || article.title}
-                                        fill
+                                        src={getImageUrl(article.author.avatar, 'thumbnail') || ''}
+                                        alt={article.author.name}
+                                        width={40}
+                                        height={40}
                                         className="object-cover"
-                                        priority
-                                        sizes="(max-width: 768px) 100vw, 768px"
                                     />
-                                </div>
-                            </figure>
-                        )}
-
-                        {/* Content Blocks */}
-                        <div className="prose prose-lg max-w-none">
-                            {article.blocks && article.blocks.length > 0 ? (
-                                article.blocks.map((block, index) => (
-                                    <BlockRenderer key={block.id || index} block={block} />
-                                ))
-                            ) : (
-                                <p className="text-gray-500 italic">
-                                    No content yet.
+                                ) : (
+                                    <span aria-hidden="true">{article.author.name?.charAt(0) || "?"}</span>
+                                )}
+                            </div>
+                            <div>
+                                <p className="font-medium text-gray-900">
+                                    {article.author.name}
                                 </p>
-                            )}
+                                {article.author.bio && (
+                                    <p className="text-sm text-gray-500">
+                                        {article.author.bio}
+                                    </p>
+                                )}
+                            </div>
                         </div>
-                    </article>
+                    )}
 
-                    {/* Sidebar - Sticky */}
-                    <aside className="hidden lg:block w-72 flex-shrink-0" aria-label="Related articles">
-                        <div className="sticky top-8">
-                            <MoreArticles currentSlug={slug} />
-                        </div>
-                    </aside>
-                </div>
+                    {/* Cover Image */}
+                    {coverUrl && (
+                        <figure className="mb-8">
+                            <div className="relative w-full aspect-video bg-gray-100">
+                                <Image
+                                    src={coverUrl}
+                                    alt={article.coverImage?.alternativeText || article.title}
+                                    fill
+                                    className="object-cover"
+                                    priority
+                                    sizes="(max-width: 768px) 100vw, 768px"
+                                />
+                            </div>
+                        </figure>
+                    )}
 
-                {/* Mobile More Articles */}
-                <div className="lg:hidden px-6">
-                    <MoreArticles currentSlug={slug} />
-                </div>
+                    {/* Content Blocks */}
+                    <div className="prose prose-lg max-w-none">
+                        {article.blocks && article.blocks.length > 0 ? (
+                            article.blocks.map((block, index) => (
+                                <BlockRenderer key={block.id || index} block={block} />
+                            ))
+                        ) : (
+                            <p className="text-gray-500 italic">
+                                No content yet.
+                            </p>
+                        )}
+                    </div>
+                </article>
 
-                {/* Footer */}
-                <Footer />
+                {/* Sidebar - Sticky */}
+                <aside className="hidden lg:block w-72 flex-shrink-0" aria-label="Related articles">
+                    <div className="sticky top-32">
+                        <MoreArticles currentSlug={slug} />
+                    </div>
+                </aside>
             </div>
-        </>
+
+            {/* Mobile More Articles */}
+            <div className="lg:hidden mt-12 pt-12 border-t border-gray-100">
+                <MoreArticles currentSlug={slug} />
+            </div>
+        </PageLayout>
     );
 }
 

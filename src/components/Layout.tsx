@@ -12,7 +12,7 @@ export async function Header({ showBackLink = false }: HeaderProps) {
     const categories = await getCategories();
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60">
+        <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-gray-200/50 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60">
             <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
                 <div className="flex items-center gap-8">
                     <Link
@@ -101,7 +101,7 @@ export function PageLayout({
     return (
         <div className="min-h-screen bg-white flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
             <Header showBackLink={showBackLink} />
-            <main className={`${maxWidthClass} mx-auto w-full flex-1 px-6 py-4 md:py-8`}>
+            <main className={`${maxWidthClass} mx-auto w-full flex-1 px-6 pt-32 pb-8 md:pt-40`}>
                 {children}
             </main>
             <Footer />
