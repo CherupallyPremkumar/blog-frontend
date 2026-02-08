@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ReactNode } from "react";
 import { config } from "@/lib/config";
 import { getCategories } from "@/lib/api";
+import CategoryNav from "./CategoryNav";
 
 // Shared header component
 interface HeaderProps {
@@ -50,24 +51,7 @@ export async function Header({ showBackLink = false }: HeaderProps) {
             {categories.length > 0 && (
                 <div className="border-t border-gray-200">
                     <div className="mx-auto max-w-6xl px-6">
-                        <nav className="flex items-center gap-6 overflow-x-auto py-3 no-scrollbar">
-                            {categories.map((category) => (
-                                <Link
-                                    key={category.documentId}
-                                    href={`/category/${category.slug}`}
-                                    className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors whitespace-nowrap"
-                                >
-                                    {category.name}
-                                </Link>
-                            ))}
-                            <Link
-                                href="/categories"
-                                className="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors whitespace-nowrap flex items-center gap-1 ml-4"
-                            >
-                                More
-                                <span className="text-xs">→</span>
-                            </Link>
-                        </nav>
+                        <CategoryNav categories={categories} />
                     </div>
                 </div>
             )}
