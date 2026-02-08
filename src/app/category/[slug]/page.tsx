@@ -1,6 +1,7 @@
 import { getArticlesByCategory, getCategories, Category, Article } from "@/lib/api";
 import Link from "next/link";
 import { PageLayout } from "@/components/Layout";
+import { Timeline } from "@/components/Timeline";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -63,33 +64,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                     <p className="text-gray-500">No articles found in this category yet.</p>
                 </div>
             ) : (
-                <div className="grid gap-8 md:grid-cols-2">
-                    {articles.map((article) => (
-                        <Link key={article.documentId} href={`/blog/${article.slug}`} className="group block">
-                            <article className="h-full bg-white border border-gray-100 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-100">
-                                <div className="flex items-center gap-2 text-xs text-gray-500 mb-3">
-                                    {article.publishedAt && (
-                                        <time dateTime={article.publishedAt} className="font-mono text-blue-600/80 font-medium">
-                                            {new Date(article.publishedAt).toLocaleDateString("en-US", {
-                                                month: "short",
-                                                day: "numeric",
-                                                year: "numeric"
-                                            })}
-                                        </time>
-                                    )}
-                                </div>
-                                <h2 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
-                                    {article.title}
-                                </h2>
-                                {article.excerpt && (
-                                    <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed">
-                                        {article.excerpt}
-                                    </p>
-                                )}
-                            </article>
-                        </Link>
-                    ))}
-                </div>
+                <Timeline articles={articles} />
             )}
         </PageLayout>
     );
