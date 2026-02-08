@@ -309,12 +309,12 @@ function formatContent(content: string): string {
         // Images with markdown format ![alt](url)
         .replace(/!\[(.*?)\]\s*\((.*?)\)/g, (match, alt, url) => {
             const fixedUrl = fixImageUrl(url);
-            return `<figure class="my-6"><img src="${fixedUrl}" alt="${alt}" class="w-full" loading="lazy" /><figcaption class="mt-2 text-center text-sm text-gray-500 italic">${alt}</figcaption></figure>`;
+            return `<figure class="my-6"><img src="${fixedUrl}" alt="${alt}" class="w-full rounded-lg" loading="lazy" /></figure>`;
         })
         // Standalone image filenames (filename.png or filename.jpg on their own line)
         .replace(/^([A-Za-z0-9_\-\s]+\.(png|jpg|jpeg|gif|webp))$/gm, (match, filename) => {
             const fixedUrl = `${strapiUrl}/uploads/${filename}`;
-            return `<figure class="my-6"><img src="${fixedUrl}" alt="${filename}" class="w-full" loading="lazy" /><figcaption class="mt-2 text-center text-sm text-gray-500 italic">${filename}</figcaption></figure>`;
+            return `<figure class="my-6"><img src="${fixedUrl}" alt="" class="w-full rounded-lg" loading="lazy" /></figure>`;
         })
         // Links (must come after images) - handle optional space and fix localhost URLs
         .replace(/\[(.*?)\]\s*\((.*?)\)/g, (match, text, url) => {
