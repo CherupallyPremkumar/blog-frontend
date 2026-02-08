@@ -50,26 +50,24 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
     return (
         <PageLayout showBackLink>
-            <div className="max-w-4xl mx-auto w-full px-6 pt-0 pb-12 md:pb-16 md:pt-4">
-                <div className="mb-6 border-b border-gray-100 pb-4">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-xl font-bold text-gray-900 tracking-tight">
-                            {category.name}
-                        </h1>
-                        <span className="text-xs font-medium px-3 py-1 bg-gray-100 text-gray-600 rounded-full">
-                            {articles.length} article{articles.length !== 1 ? 's' : ''}
-                        </span>
-                    </div>
+            <div className="mb-4 border-b border-gray-100 pb-4">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-xl font-bold text-gray-900 tracking-tight">
+                        {category.name}
+                    </h1>
+                    <span className="text-xs font-medium px-3 py-1 bg-gray-100 text-gray-600 rounded-full">
+                        {articles.length} article{articles.length !== 1 ? 's' : ''}
+                    </span>
                 </div>
-
-                {articles.length === 0 ? (
-                    <div className="text-center py-12 bg-gray-50 rounded-lg">
-                        <p className="text-gray-500">No articles found in this category yet.</p>
-                    </div>
-                ) : (
-                    <Timeline articles={articles} />
-                )}
             </div>
+
+            {articles.length === 0 ? (
+                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                    <p className="text-gray-500">No articles found in this category yet.</p>
+                </div>
+            ) : (
+                <Timeline articles={articles} />
+            )}
         </PageLayout>
     );
 }

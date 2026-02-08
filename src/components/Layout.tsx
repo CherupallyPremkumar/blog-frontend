@@ -101,7 +101,7 @@ export function PageLayout({
     return (
         <div className="min-h-screen bg-white flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
             <Header showBackLink={showBackLink} />
-            <main className={`${maxWidthClass} mx-auto w-full flex-1 px-6 py-12 md:py-20`}>
+            <main className={`${maxWidthClass} mx-auto w-full flex-1 px-6 py-4 md:py-8`}>
                 {children}
             </main>
             <Footer />

@@ -23,9 +23,9 @@ export default async function Home() {
       <Header />
 
       {/* Main Content */}
-      <main id="main-content" className="max-w-4xl mx-auto w-full flex-1 px-6 py-8 md:py-12">
+      <main id="main-content" className="max-w-4xl mx-auto w-full flex-1 px-6 pt-2 pb-12">
         {/* Timeline Header */}
-        <div className="flex items-center justify-between mb-8 border-b border-gray-100 pb-4">
+        <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
           <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
             Timeline
           </h2>
