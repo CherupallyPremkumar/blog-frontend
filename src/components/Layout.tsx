@@ -8,7 +8,12 @@ import CategoryNav from "./CategoryNav";
 import HeaderContent from "./header/HeaderContent";
 
 export async function Header() {
-    const categories = await getCategories(true);
+    const rootCategories = await getCategories(true);
+
+    // Flatten to get all subcategories (children)
+    const subcategories = rootCategories.flatMap(parent =>
+        parent.children || []
+    );
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-gray-200/50 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60">
@@ -35,11 +40,11 @@ export async function Header() {
                 <HeaderContent />
             </div>
 
-            {/* Category Navigation */}
-            {categories.length > 0 && (
+            {/* Category Navigation - Now showing subcategories */}
+            {subcategories.length > 0 && (
                 <div className="border-t border-gray-200">
                     <div className="mx-auto max-w-6xl px-6">
-                        <CategoryNav categories={categories} />
+                        <CategoryNav categories={subcategories} />
                     </div>
                 </div>
             )}
