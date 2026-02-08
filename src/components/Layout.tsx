@@ -48,7 +48,7 @@ export async function Header({ showBackLink = false }: HeaderProps) {
 
             {/* Category Navigation */}
             {categories.length > 0 && (
-                <div className="border-t border-gray-100/50">
+                <div className="border-t border-gray-200">
                     <div className="mx-auto max-w-6xl px-6">
                         <nav className="flex items-center gap-6 overflow-x-auto py-3 no-scrollbar">
                             {categories.map((category) => (
