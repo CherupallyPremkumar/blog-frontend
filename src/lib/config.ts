@@ -29,7 +29,7 @@ export const config = {
     // API Configuration
     api: {
         strapiUrl: getEnvVar('NEXT_PUBLIC_STRAPI_API_URL'),
-        timeout: parseInt(getOptionalEnvVar('NEXT_PUBLIC_API_TIMEOUT', '10000'), 10),
+        timeout: parseInt(getOptionalEnvVar('NEXT_PUBLIC_API_TIMEOUT', '30000'), 10),
         retryAttempts: parseInt(getOptionalEnvVar('NEXT_PUBLIC_API_RETRY_ATTEMPTS', '3'), 10),
     },
 

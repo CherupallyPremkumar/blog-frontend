@@ -93,30 +93,56 @@ export default async function ArticlePage({ params }: PageProps) {
     const { slug } = await params;
 
     let article;
+    let error: string | null = null;
+
     try {
         article = await getArticleBySlug(slug);
-    } catch {
+    } catch (e) {
+        error = e instanceof Error ? e.message : "Failed to fetch article";
+    }
+
+    // If it's a "real" 404 (article not found in database)
+    if (!article && !error) {
         notFound();
     }
 
-    if (!article) {
-        notFound();
+    // If it's a server error (e.g. timeout, backend spin-up)
+    if (error) {
+        return (
+            <PageLayout>
+                <div className="max-w-3xl mx-auto py-12 px-4">
+                    <div className="border border-amber-200 bg-amber-50 p-8 text-center rounded-2xl shadow-sm">
+                        <h2 className="text-xl font-bold text-amber-900 mb-2">Server Error</h2>
+                        <p className="text-amber-800 mb-6">
+                            Unable to load this article. The backend might be starting up.
+                        </p>
+                        <a
+                            href={`/blog/${slug}`}
+                            className="px-6 py-2.5 bg-amber-600 text-white rounded-xl font-medium hover:bg-amber-700 transition-all shadow-md active:scale-95"
+                        >
+                            Refresh Page
+                        </a>
+                    </div>
+                </div>
+            </PageLayout>
+        );
     }
 
-    const coverUrl = getImageUrl(article.coverImage, 'large');
+    // At this point, article is guaranteed to be defined
+    const coverUrl = getImageUrl(article!.coverImage, 'large');
 
     // Generate JSON-LD structured data
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "BlogPosting",
-        headline: article.title,
-        description: article.excerpt,
+        headline: article!.title,
+        description: article!.excerpt,
         image: coverUrl,
-        datePublished: article.publishedAt,
-        dateModified: article.updatedAt,
-        author: article.author ? {
+        datePublished: article!.publishedAt,
+        dateModified: article!.updatedAt,
+        author: article!.author ? {
             "@type": "Person",
-            name: article.author.name,
+            name: article!.author.name,
         } : undefined,
         publisher: {
             "@type": "Organization",

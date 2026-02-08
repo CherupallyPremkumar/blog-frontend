@@ -146,7 +146,7 @@ async function fetchAPI<T>(
  * Get all published articles, sorted by order field
  */
 export async function getArticles(): Promise<Article[]> {
-    const response = await fetchAPI<Article[]>('/api/articles?populate[0]=*&sort=order:asc');
+    const response = await fetchAPI<Article[]>('/api/articles?populate=*&sort=order:asc');
     return response.data;
 }
 
