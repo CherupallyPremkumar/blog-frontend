@@ -169,7 +169,7 @@ export default async function ArticlePage({ params }: PageProps) {
             {/* Two Column Layout */}
             <div className="flex gap-8 flex-1">
                 {/* Article - Scrollable */}
-                <article id="main-content" className="flex-1 min-w-0">
+                <article id="main-content" className="flex-1 min-w-0 pt-6">
                     {/* Breadcrumbs */}
                     <nav className="mb-6 flex items-center gap-2 text-sm text-gray-500 overflow-x-auto whitespace-nowrap pb-2 scrollbar-none">
                         <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
@@ -242,7 +242,7 @@ export default async function ArticlePage({ params }: PageProps) {
                                 )}
                             </div>
                             <div>
-                                <p className="font-medium text-gray-900">
+                                <p className="text-sm font-medium text-gray-700">
                                     {article!.author.name}
                                 </p>
                                 {article!.author.bio && (
