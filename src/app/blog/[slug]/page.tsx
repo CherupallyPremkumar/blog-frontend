@@ -354,7 +354,18 @@ function formatContent(content: string): string {
         // Paragraphs
         .split("\n\n")
         .map((p) => {
-            if (p.startsWith("<h") || p.startsWith("<li") || p.startsWith("<figure")) return p;
+            if (p.startsWith("<h") || p.startsWith("<li")) return p;
+            if (p.startsWith("<figure")) {
+                const figureEndIndex = p.lastIndexOf("</figure>") + 9;
+                if (figureEndIndex < p.length) {
+                    const figurePart = p.substring(0, figureEndIndex);
+                    const textPart = p.substring(figureEndIndex).trim();
+                    if (textPart) {
+                        return `${figurePart}<p class="text-gray-900 leading-relaxed mb-4 mt-4">${textPart.replace(/\n/g, '<br/>')}</p>`;
+                    }
+                }
+                return p;
+            }
             if (p.includes("<li>")) return `<ul class="list-disc pl-6 my-4 text-gray-900">${p}</ul>`;
             if (p.trim() === "") return "";
             // Convert single newlines to <br> and wrap in paragraph
