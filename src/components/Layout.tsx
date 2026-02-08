@@ -2,11 +2,6 @@ import Link from "next/link";
 import { ReactNode } from "react";
 import { config } from "@/lib/config";
 
-interface HeaderProps {
-    showBackLink?: boolean;
-}
-
-/**
 // Shared header component
 interface HeaderProps {
     showBackLink?: boolean;
@@ -29,7 +24,7 @@ export function Header({ showBackLink = false }: HeaderProps) {
                             IOClick
                         </span>
                     </Link>
-                    
+
                     {!showBackLink && (
                         <p className="hidden text-sm font-medium text-gray-500 sm:block border-l border-gray-200 pl-4 py-1">
                             {config.site.description}
