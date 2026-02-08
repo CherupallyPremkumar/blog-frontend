@@ -101,41 +101,42 @@ export default async function Home() {
         ) : (
           <div className="relative" role="feed" aria-label="Blog articles timeline">
             {/* Vertical timeline line */}
-            <div className="absolute left-0 md:left-32 top-0 bottom-0 w-0.5 bg-gray-200" aria-hidden="true" />
+            <div className="absolute left-0 md:left-24 top-0 bottom-0 w-px bg-blue-100" aria-hidden="true" />
 
             {/* Timeline items */}
-            <div className="space-y-12">
+            <div className="space-y-8">
               {groupedArticles.map(({ date, articles: monthArticles }) => (
                 <section key={date.toISOString()} className="relative" aria-label={`Articles from ${date.toLocaleDateString("en-US", { month: "long", year: "numeric" })}`}>
                   {/* Month/Year label */}
-                  <div className="flex items-center mb-6">
-                    <div className="hidden md:block w-32 pr-8 text-right">
-                      <span className="text-lg font-bold text-gray-900">
+                  <div className="flex items-center mb-4">
+                    <div className="hidden md:block w-24 pr-6 text-right">
+                      <span className="text-sm font-bold text-gray-900 uppercase tracking-wider">
                         {date.toLocaleDateString("en-US", { month: "short" })}
                       </span>
-                      <span className="text-gray-400 ml-2">
+                      <div className="text-xs text-gray-400 font-mono mt-0.5">
                         {date.getFullYear()}
-                      </span>
+                      </div>
                     </div>
                     {/* Timeline dot for month */}
-                    <div className="absolute left-0 md:left-32 w-4 h-4 -ml-2 bg-gray-900 rounded-full border-4 border-white shadow" aria-hidden="true" />
-                    <div className="md:hidden ml-8 text-lg font-bold text-gray-900">
-                      {date.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                    <div className="absolute left-0 md:left-24 w-3 h-3 -ml-1.5 bg-blue-600 rounded-full border-2 border-white shadow-sm z-10" aria-hidden="true" />
+                    <div className="md:hidden ml-6 text-lg font-bold text-gray-900 flex items-baseline gap-2">
+                      <span>{date.toLocaleDateString("en-US", { month: "long" })}</span>
+                      <span className="text-gray-400 text-sm font-normal">{date.getFullYear()}</span>
                     </div>
                   </div>
 
                   {/* Articles for this month */}
-                  <div className="ml-8 md:ml-40 space-y-4">
+                  <div className="ml-6 md:ml-32 space-y-3">
                     {monthArticles.map((article) => (
                       <article key={article.documentId} className="relative group">
                         {/* Small dot on timeline */}
-                        <div className="absolute -left-8 md:-left-8 top-2 w-2 h-2 bg-gray-300 rounded-full group-hover:bg-blue-500 transition-colors" aria-hidden="true" />
+                        <div className="absolute -left-6 md:-left-[2.1rem] top-2.5 w-1.5 h-1.5 bg-blue-200 rounded-full group-hover:bg-blue-600 group-hover:scale-125 transition-all duration-300" aria-hidden="true" />
 
                         <Link href={`/blog/${article.slug}`} className="block">
-                          <div className="p-4 rounded-lg border border-transparent hover:border-gray-200 hover:bg-gray-50 transition-all">
-                            <div className="flex items-center gap-3 text-sm text-gray-500 mb-1">
+                          <div className="p-4 -ml-4 rounded-xl border border-transparent hover:border-blue-100 hover:bg-blue-50/50 transition-all duration-300 group-hover:shadow-sm">
+                            <div className="flex items-center gap-2 text-xs text-gray-500 mb-1.5">
                               {article.publishedAt && (
-                                <time dateTime={article.publishedAt} className="font-mono text-xs">
+                                <time dateTime={article.publishedAt} className="font-mono text-blue-600/80 font-medium">
                                   {new Date(article.publishedAt).toLocaleDateString("en-US", {
                                     month: "short",
                                     day: "numeric",
@@ -144,18 +145,18 @@ export default async function Home() {
                               )}
                               {article.category && (
                                 <>
-                                  <span aria-hidden="true">•</span>
-                                  <span className="text-xs uppercase tracking-wide">
+                                  <span aria-hidden="true" className="text-gray-300">•</span>
+                                  <span className="uppercase tracking-wider font-medium text-gray-500 group-hover:text-blue-600 transition-colors">
                                     {article.category.name}
                                   </span>
                                 </>
                               )}
                             </div>
-                            <h2 className="text-lg font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                            <h2 className="text-lg font-semibold text-gray-900 group-hover:text-blue-700 transition-colors leading-snug">
                               {article.title}
                             </h2>
                             {article.excerpt && (
-                              <p className="text-gray-600 text-sm mt-1 line-clamp-2">
+                              <p className="text-gray-600 text-sm mt-1.5 line-clamp-2 leading-relaxed group-hover:text-gray-700">
                                 {article.excerpt}
                               </p>
                             )}
@@ -169,10 +170,10 @@ export default async function Home() {
             </div>
 
             {/* End of timeline marker */}
-            <div className="relative mt-12">
-              <div className="absolute left-0 md:left-32 w-3 h-3 -ml-1.5 bg-gray-300 rounded-full" aria-hidden="true" />
-              <p className="ml-8 md:ml-40 text-gray-400 text-sm italic">
-                The beginning...
+            <div className="relative mt-12 pb-12">
+              <div className="absolute left-0 md:left-24 w-2 h-2 -ml-1 bg-blue-200 rounded-full" aria-hidden="true" />
+              <p className="ml-6 md:ml-32 text-gray-400 text-xs uppercase tracking-widest font-medium">
+                The beginning
               </p>
             </div>
           </div>
