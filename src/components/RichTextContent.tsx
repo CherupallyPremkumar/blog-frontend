@@ -45,6 +45,25 @@ export default function RichTextContent({ content }: RichTextContentProps) {
                     rehypePlugins={[rehypeRaw]}
                     remarkPlugins={[remarkGfm]}
                     components={{
+                        // Prevent p tags from wrapping figure elements (causes hydration errors)
+                        p({ children, ...props }) {
+                            // Check if the paragraph only contains an image
+                            const hasOnlyImage = Array.isArray(children)
+                                ? children.every(child =>
+                                    typeof child === 'object' &&
+                                    child !== null &&
+                                    'type' in child &&
+                                    (child.type === 'img' || child.type === 'figure')
+                                )
+                                : false;
+
+                            // If paragraph only contains images, render children directly
+                            if (hasOnlyImage) {
+                                return <>{children}</>;
+                            }
+
+                            return <p className="text-gray-900 leading-relaxed mb-4" {...props}>{children}</p>;
+                        },
                         code({ className, children, ...props }) {
                             const match = /language-(\w+)/.exec(className || "");
                             const language = match ? match[1] : "";
@@ -91,9 +110,7 @@ export default function RichTextContent({ content }: RichTextContentProps) {
                                 </figure>
                             );
                         },
-                        p({ children }) {
-                            return <p className="text-gray-900 leading-relaxed mb-4">{children}</p>;
-                        },
+
                         li({ children }) {
                             return <li className="my-1 text-gray-900 leading-snug">{children}</li>;
                         },
