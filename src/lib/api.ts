@@ -185,7 +185,7 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
  * Get all categories
  */
 export async function getCategories(): Promise<Category[]> {
-    const response = await fetchAPI<Category[]>('/api/categories?populate=*');
+    const response = await fetchAPI<Category[]>('/api/categories?populate=*&sort=order:asc');
     return response.data;
 }
 
