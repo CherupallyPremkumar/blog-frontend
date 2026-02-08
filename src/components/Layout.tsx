@@ -7,31 +7,43 @@ interface HeaderProps {
 }
 
 /**
- * Shared header component for consistent navigation
- */
+// Shared header component
+interface HeaderProps {
+    showBackLink?: boolean;
+}
+
 export function Header({ showBackLink = false }: HeaderProps) {
     return (
-        <header className="border-b border-gray-200 fixed top-0 left-0 right-0 bg-white z-50">
-            <div className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-                <div>
+        <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60">
+            <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+                <div className="flex items-center gap-8">
                     <Link
                         href="/"
-                        className="text-2xl font-bold text-gray-900 hover:text-gray-700 transition-colors"
+                        className="group flex items-center gap-2.5 font-sans"
+                        aria-label="IOClick Home"
                     >
-                        {config.site.name}
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-xs font-bold font-mono text-white shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:bg-blue-700">
+                            IO
+                        </div>
+                        <span className="text-xl font-bold tracking-tight text-gray-900">
+                            IOClick
+                        </span>
                     </Link>
+                    
                     {!showBackLink && (
-                        <p className="text-gray-500 mt-1">
+                        <p className="hidden text-sm font-medium text-gray-500 sm:block border-l border-gray-200 pl-4 py-1">
                             {config.site.description}
                         </p>
                     )}
                 </div>
+
                 {showBackLink && (
                     <Link
                         href="/"
-                        className="text-gray-600 hover:text-gray-900 text-sm flex items-center gap-1 transition-colors"
+                        className="group flex items-center gap-1.5 rounded-full bg-gray-100/50 px-4 py-1.5 text-sm font-medium text-gray-600 transition-all hover:bg-gray-100 hover:text-gray-900"
                     >
-                        ← Back to Timeline
+                        <span className="transition-transform group-hover:-translate-x-0.5">←</span>
+                        Back to Timeline
                     </Link>
                 )}
             </div>
@@ -39,30 +51,29 @@ export function Header({ showBackLink = false }: HeaderProps) {
     );
 }
 
-/**
- * Shared footer component
- */
-export function Footer() {
-    const currentYear = new Date().getFullYear();
+interface FooterProps { }
 
+export function Footer({ }: FooterProps) {
     return (
-        <footer className="border-t border-gray-200 mt-20">
-            <div className="max-w-4xl mx-auto px-6 py-8 text-center text-gray-500 text-sm">
-                © {currentYear} {config.site.author}. All rights reserved.
+        <footer className="mt-20 border-t border-gray-100 py-12">
+            <div className="mx-auto max-w-6xl px-6 text-center text-sm text-gray-500">
+                <p>© {new Date().getFullYear()} {config.site.author}. All rights reserved.</p>
+                <div className="mt-4 flex justify-center gap-6">
+                    <a href="#" className="hover:text-gray-900 transition-colors">Twitter</a>
+                    <a href="#" className="hover:text-gray-900 transition-colors">GitHub</a>
+                    <a href="#" className="hover:text-gray-900 transition-colors">LinkedIn</a>
+                </div>
             </div>
         </footer>
     );
 }
 
 interface PageLayoutProps {
-    children: ReactNode;
+    children: React.ReactNode;
     showBackLink?: boolean;
     maxWidth?: 'default' | 'wide';
 }
 
-/**
- * Shared page layout with header and footer
- */
 export function PageLayout({
     children,
     showBackLink = false,
@@ -71,9 +82,9 @@ export function PageLayout({
     const maxWidthClass = maxWidth === 'wide' ? 'max-w-6xl' : 'max-w-4xl';
 
     return (
-        <div className="min-h-screen bg-white flex flex-col">
+        <div className="min-h-screen bg-white flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
             <Header showBackLink={showBackLink} />
-            <main className={`${maxWidthClass} mx-auto px-6 py-10 pt-32 flex-1 w-full`}>
+            <main className={`${maxWidthClass} mx-auto w-full flex-1 px-6 py-12 md:py-20`}>
                 {children}
             </main>
             <Footer />
