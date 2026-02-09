@@ -35,6 +35,12 @@ const nextConfig: NextConfig = {
     root: process.cwd(), // Explicitly set workspace root to current directory
   },
 
+  // Limit concurrency to prevent 429 errors during build
+  experimental: {
+    workerThreads: false,
+    cpus: 1,
+  },
+
   // Security headers
   async headers() {
     return [

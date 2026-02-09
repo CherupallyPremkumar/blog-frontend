@@ -136,7 +136,16 @@ async function fetchAPI<T>(
 
             // Wait before retrying (exponential backoff)
             if (attempt < config.api.retryAttempts - 1) {
-                await delay(Math.pow(2, attempt) * 1000);
+                // If rate limited, wait longer (5 seconds)
+                const delayMs = lastError instanceof ApiError && lastError.status === 429
+                    ? 5000
+                    : Math.pow(2, attempt) * 1000;
+
+                if (config.isDev) {
+                    console.warn(`[API] Waiting ${delayMs}ms before retry...`);
+                }
+
+                await delay(delayMs);
             }
         }
     }
