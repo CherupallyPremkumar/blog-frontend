@@ -71,6 +71,9 @@ async function fetchAPI<T>(
         headers: {
             'Content-Type': 'application/json',
         },
+        next: {
+            revalidate: config.cache.revalidateSeconds,
+        },
     };
 
     const mergedOptions: RequestInit = {
@@ -227,9 +230,7 @@ function buildCategoryTree(categories: Category[]): Category[] {
  * Get all categories organized as a tree
  */
 export async function getCategories(tree: boolean = false): Promise<Category[]> {
-    const response = await fetchAPI<Category[]>('/api/categories?populate=*&sort=order:asc&pagination[pageSize]=100', {
-        next: { revalidate: 3600 }
-    });
+    const response = await fetchAPI<Category[]>('/api/categories?populate=*&sort=order:asc&pagination[pageSize]=100');
     const categories = response.data;
 
     if (tree) {

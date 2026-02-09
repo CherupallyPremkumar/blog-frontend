@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { KeepAlive } from "@/components/KeepAlive";
 import { SkipToContent, Header, HeaderSkeleton } from "@/components/Layout";
 import "./globals.css";
 
@@ -93,6 +94,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SkipToContent />
+        <KeepAlive />
         <Header />
         {children}
       </body>
