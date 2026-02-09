@@ -156,7 +156,18 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             </PageLayout>
         );
     } catch (error) {
-        console.error("Error loading category page:", error);
-        notFound();
+        console.error(`Error loading category page for slug "${slug}":`, error);
+
+        // Only trigger notFound() if it's explicitly a 404 or if the category truly doesn't exist
+        // Otherwise rethrow so Next.js handles it as a build error (500)
+        // This prevents suppressing API errors during build
+        if (error instanceof Error && (error.message.includes('404') || error.message.includes('NOT_FOUND'))) {
+            notFound();
+        }
+
+        // If we get here, it's likely an API issue (500, 403, network, etc)
+        // Rethrowing will fail the build for this page, which is what we want
+        // so we can see the actual error instead of a generic 404
+        throw error;
     }
 }

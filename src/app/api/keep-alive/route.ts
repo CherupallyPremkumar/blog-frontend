@@ -12,6 +12,8 @@ export async function GET() {
         // Usually /_health or just the root /api is enough.
         // We'll use a timeout to avoid hanging if the backend is cold-starting.
         // We'll use a timeout to avoid hanging if the backend is cold-starting.
+        console.log(`[Keep-Alive] Hit at ${new Date().toISOString()} | Target Backend: ${backendUrl}`);
+
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
 
