@@ -28,7 +28,7 @@ function getOptionalEnvVar(key: string, defaultValue: string): string {
 export const config = {
     // API Configuration
     api: {
-        strapiUrl: getOptionalEnvVar('NEXT_PUBLIC_STRAPI_API_URL', 'http://localhost:1337'),
+        strapiUrl: getEnvVar('NEXT_PUBLIC_STRAPI_API_URL'),
         timeout: parseInt(getOptionalEnvVar('NEXT_PUBLIC_API_TIMEOUT', '30000'), 10),
         retryAttempts: parseInt(getOptionalEnvVar('NEXT_PUBLIC_API_RETRY_ATTEMPTS', '5'), 10),
     },
