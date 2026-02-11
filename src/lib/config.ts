@@ -1,25 +1,7 @@
-// Centralized configuration with environment variable validation
-
-// ============================================================
-// Environment Variable Validation
-// ============================================================
-
-function getEnvVar(key: string, required: boolean = true): string {
-    const value = process.env[key];
-
-    if (required && !value) {
-        throw new Error(
-            `Missing required environment variable: ${key}. ` +
-            `Please check your .env.local file.`
-        );
-    }
-
-    return value ?? '';
-}
-
-function getOptionalEnvVar(key: string, defaultValue: string): string {
-    return process.env[key] ?? defaultValue;
-}
+// Centralized configuration
+// IMPORTANT: Next.js can only inline NEXT_PUBLIC_ vars when accessed
+// directly (e.g., process.env.NEXT_PUBLIC_FOO), NOT via dynamic access
+// (e.g., process.env[key]). All NEXT_PUBLIC_ vars must use direct access.
 
 // ============================================================
 // Configuration Object
@@ -28,38 +10,35 @@ function getOptionalEnvVar(key: string, defaultValue: string): string {
 export const config = {
     // API Configuration
     api: {
-        strapiUrl: getEnvVar('NEXT_PUBLIC_STRAPI_API_URL'),
-        timeout: parseInt(getOptionalEnvVar('NEXT_PUBLIC_API_TIMEOUT', '30000'), 10),
-        retryAttempts: parseInt(getOptionalEnvVar('NEXT_PUBLIC_API_RETRY_ATTEMPTS', '5'), 10),
+        strapiUrl: process.env.NEXT_PUBLIC_STRAPI_API_URL || '',
+        timeout: parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '30000', 10),
+        retryAttempts: parseInt(process.env.NEXT_PUBLIC_API_RETRY_ATTEMPTS || '5', 10),
     },
 
     // Site Configuration
     site: {
-        name: getOptionalEnvVar('NEXT_PUBLIC_SITE_NAME', 'IOClick'),
-        description: getOptionalEnvVar(
-            'NEXT_PUBLIC_SITE_DESCRIPTION',
-            'Documenting my journey in system design & engineering'
-        ),
-        url: getOptionalEnvVar('NEXT_PUBLIC_SITE_URL', 'https://ioclick.me'),
-        author: getOptionalEnvVar('NEXT_PUBLIC_SITE_AUTHOR', 'Prem Kumar'),
+        name: process.env.NEXT_PUBLIC_SITE_NAME || 'IOClick',
+        description: process.env.NEXT_PUBLIC_SITE_DESCRIPTION || 'Documenting my journey in system design & engineering',
+        url: process.env.NEXT_PUBLIC_SITE_URL || 'https://ioclick.me',
+        author: process.env.NEXT_PUBLIC_SITE_AUTHOR || 'Prem Kumar',
     },
 
     // Feature Flags
     features: {
-        analytics: getOptionalEnvVar('NEXT_PUBLIC_ENABLE_ANALYTICS', 'false') === 'true',
-        darkMode: getOptionalEnvVar('NEXT_PUBLIC_ENABLE_DARK_MODE', 'true') === 'true',
-        search: getOptionalEnvVar('NEXT_PUBLIC_ENABLE_SEARCH', 'true') === 'true',
+        analytics: process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === 'true',
+        darkMode: (process.env.NEXT_PUBLIC_ENABLE_DARK_MODE || 'true') === 'true',
+        search: (process.env.NEXT_PUBLIC_ENABLE_SEARCH || 'true') === 'true',
     },
 
     // Analytics Configuration (optional)
     analytics: {
-        gaId: getOptionalEnvVar('NEXT_PUBLIC_GA_ID', ''),
-        plausibleDomain: getOptionalEnvVar('NEXT_PUBLIC_PLAUSIBLE_DOMAIN', ''),
+        gaId: process.env.NEXT_PUBLIC_GA_ID || '',
+        plausibleDomain: process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN || '',
     },
 
     // Cache Configuration
     cache: {
-        revalidateSeconds: parseInt(getOptionalEnvVar('NEXT_PUBLIC_REVALIDATE_SECONDS', '60'), 10),
+        revalidateSeconds: parseInt(process.env.NEXT_PUBLIC_REVALIDATE_SECONDS || '60', 10),
     },
 
     // Development flags
@@ -74,23 +53,19 @@ export const config = {
 export type Config = typeof config;
 
 // ============================================================
-// Validation Helper (call at app startup)
+// Validation Helper (call at app startup, server-side only)
 // ============================================================
 
 export function validateConfig(): void {
-    // This will throw if required env vars are missing
-    // Called implicitly when config is imported
-    // Log only in development
     if (process.env.NODE_ENV === 'development') {
         console.log(`[Config] Environment: ${process.env.NODE_ENV}`);
         console.log(`[Config] Strapi URL: ${config.api.strapiUrl}`);
     }
 
-    // Warn about security issues in production
-    if (config.isProd && config.api.strapiUrl.includes('localhost')) {
-        console.warn(
-            '[Config] WARNING: Using localhost Strapi URL in production. ' +
-            'Please update NEXT_PUBLIC_STRAPI_API_URL.'
+    if (!config.api.strapiUrl) {
+        console.error(
+            '[Config] ERROR: NEXT_PUBLIC_STRAPI_API_URL is not set. ' +
+            'Please check your .env.local file or Render environment variables.'
         );
     }
 }
