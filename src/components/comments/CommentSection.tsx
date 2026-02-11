@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { createComment, getAuthToken, getMe } from '@/lib/api';
-import type { Comment, User } from '@/types';
+import { useState } from 'react';
+import { createComment } from '@/lib/api';
+import type { Comment } from '@/types';
 import CommentList from './CommentList';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -15,24 +15,8 @@ export default function CommentSection({ articleId, initialComments }: CommentSe
     const [comments, setComments] = useState<Comment[]>(initialComments);
     const [newComment, setNewComment] = useState('');
     const [loading, setLoading] = useState(false);
-    const [user, setUser] = useState<User | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const { openAuthModal } = useAuth();
-
-    useEffect(() => {
-        const checkUser = async () => {
-            const token = getAuthToken();
-            if (token) {
-                try {
-                    const userData = await getMe();
-                    setUser(userData);
-                } catch {
-                    // Token invalid
-                }
-            }
-        };
-        checkUser();
-    }, []);
+    const { user, openAuthModal } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -55,6 +39,14 @@ export default function CommentSection({ articleId, initialComments }: CommentSe
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleCommentUpdated = (updated: Comment) => {
+        setComments(comments.map(c => c.id === updated.id ? updated : c));
+    };
+
+    const handleCommentDeleted = (commentId: number) => {
+        setComments(comments.filter(c => c.id !== commentId));
     };
 
     return (
@@ -111,7 +103,11 @@ export default function CommentSection({ articleId, initialComments }: CommentSe
                 )}
             </div>
 
-            <CommentList comments={comments} />
+            <CommentList
+                comments={comments}
+                onCommentUpdated={handleCommentUpdated}
+                onCommentDeleted={handleCommentDeleted}
+            />
         </section>
     );
 }

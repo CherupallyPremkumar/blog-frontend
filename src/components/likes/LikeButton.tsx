@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { createLike, deleteLike, getAuthToken, getMe } from '@/lib/api';
-import type { Like, User } from '@/types';
+import { useState } from 'react';
+import { createLike, deleteLike } from '@/lib/api';
+import type { Like } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface LikeButtonProps {
@@ -12,30 +12,14 @@ interface LikeButtonProps {
 
 export default function LikeButton({ articleId, initialLikes }: LikeButtonProps) {
     const [likes, setLikes] = useState<Like[]>(initialLikes);
-    const [userLikedLike, setUserLikedLike] = useState<Like | undefined>(undefined);
     const [loading, setLoading] = useState(false);
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
-    const { openAuthModal } = useAuth();
+    const { user, openAuthModal } = useAuth();
 
-    useEffect(() => {
-        const checkUser = async () => {
-            const token = getAuthToken();
-            if (token) {
-                try {
-                    const user = await getMe();
-                    setCurrentUser(user);
-                    const existingLike = initialLikes.find(l => l.user?.id === user.id);
-                    setUserLikedLike(existingLike);
-                } catch {
-                    // Token might be invalid
-                }
-            }
-        };
-        checkUser();
-    }, [initialLikes]);
+    const userLikedLike = user ? likes.find(l => l.user?.id === user.id) : undefined;
+    const isLiked = !!userLikedLike;
 
     const handleToggle = async () => {
-        if (!currentUser) {
+        if (!user) {
             openAuthModal('login');
             return;
         }
@@ -48,12 +32,10 @@ export default function LikeButton({ articleId, initialLikes }: LikeButtonProps)
                 await deleteLike(userLikedLike.documentId);
                 const newLikes = likes.filter(l => l.id !== userLikedLike.id);
                 setLikes(newLikes);
-                setUserLikedLike(undefined);
             } else {
                 const newLike = await createLike(articleId);
-                const likeWithUser = { ...newLike, user: currentUser };
+                const likeWithUser = { ...newLike, user: user };
                 setLikes([...likes, likeWithUser]);
-                setUserLikedLike(likeWithUser);
             }
         } catch (error) {
             console.error('Failed to toggle like', error);
@@ -62,8 +44,6 @@ export default function LikeButton({ articleId, initialLikes }: LikeButtonProps)
             setLoading(false);
         }
     };
-
-    const isLiked = !!userLikedLike;
 
     return (
         <button

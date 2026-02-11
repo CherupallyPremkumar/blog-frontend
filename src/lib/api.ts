@@ -81,7 +81,9 @@ export const setAuthToken = (token: string | null) => {
 };
 
 export const getAuthToken = () => {
-    if (authToken) return authToken;
+    if (authToken) {
+        return authToken;
+    }
     if (typeof window !== 'undefined') {
         const token = localStorage.getItem('jwt');
         if (token) {
@@ -114,6 +116,8 @@ async function fetchAPI<T>(
             ...defaultOptions.headers,
             Authorization: `Bearer ${token}`,
         };
+    } else {
+        // No token available
     }
 
     const mergedOptions: RequestInit = {
@@ -344,7 +348,8 @@ export async function login(identifier: string, password: string): Promise<AuthR
     });
 
     if (!response.ok) {
-        throw new Error('Login failed');
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Login failed');
     }
 
     const data = await response.json();
@@ -360,7 +365,8 @@ export async function register(username: string, email: string, password: string
     });
 
     if (!response.ok) {
-        throw new Error('Registration failed');
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Registration failed');
     }
 
     const data = await response.json();
@@ -372,7 +378,7 @@ export async function getMe(): Promise<User> {
     const token = getAuthToken();
     if (!token) throw new Error('Not authenticated');
 
-    const res = await fetch(`${STRAPI_API_URL}/api/users/me`, {
+    const res = await fetch(`${STRAPI_API_URL}/api/users/me?populate=avatar`, {
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
@@ -386,6 +392,58 @@ export async function getMe(): Promise<User> {
     // Strapi /users/me returns the user object directly (not wrapped in { data })
     return res.json();
 }
+
+export async function updateProfile(bio?: string, avatar?: File): Promise<User> {
+    const token = getAuthToken();
+    if (!token) throw new Error('Not authenticated');
+
+    const formData = new FormData();
+    if (bio !== undefined) {
+        formData.append('bio', bio);
+    }
+    if (avatar) {
+        formData.append('files.avatar', avatar);
+    }
+
+    const res = await fetch(`${STRAPI_API_URL}/api/profile`, {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            // Do NOT set Content-Type — browser sets it with boundary for multipart
+        },
+        body: formData,
+    });
+
+    if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        throw new ApiError(err?.error?.message || 'Failed to update profile', res.status);
+    }
+
+    return res.json();
+}
+
+export async function getMyLikedArticles(): Promise<Article[]> {
+    const token = getAuthToken();
+    if (!token) throw new Error('Not authenticated');
+
+    const res = await fetch(`${STRAPI_API_URL}/api/profile/liked-articles`, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!res.ok) {
+        throw new ApiError('Failed to fetch liked articles', res.status);
+    }
+
+    const data = await res.json();
+    return data.data;
+}
+
+// ============================================================
+// Profile Methods (above) ↑
+// ============================================================
 
 // ============================================================
 // Comment Methods
@@ -412,6 +470,22 @@ export async function createComment(articleId: number, content: string): Promise
         }),
     });
     return response.data;
+}
+
+export async function updateComment(documentId: string, content: string): Promise<Comment> {
+    const response = await fetchAPI<Comment>(`/api/comments/${documentId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            data: { content }
+        }),
+    });
+    return response.data;
+}
+
+export async function deleteComment(documentId: string): Promise<void> {
+    await fetchAPI(`/api/comments/${documentId}`, {
+        method: 'DELETE',
+    });
 }
 
 // ============================================================

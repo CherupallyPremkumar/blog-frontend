@@ -157,6 +157,8 @@ export interface User {
     provider: string;
     confirmed: boolean;
     blocked: boolean;
+    bio?: string;
+    avatar?: StrapiMedia;
     createdAt: string;
     updatedAt: string;
 }

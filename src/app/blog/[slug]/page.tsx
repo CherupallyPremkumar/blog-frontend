@@ -12,6 +12,7 @@ import Mermaid from "@/components/Mermaid";
 import PlantUML from "@/components/PlantUML";
 import LikeButton from "@/components/likes/LikeButton";
 import CommentSection from "@/components/comments/CommentSection";
+import RecentlyViewedTracker from "@/components/RecentlyViewedTracker";
 
 export const revalidate = 3600;
 
@@ -173,6 +174,19 @@ export default async function ArticlePage({ params }: PageProps) {
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+
+            {/* Track recently viewed */}
+            <RecentlyViewedTracker
+                article={{
+                    id: article!.id,
+                    documentId: article!.documentId,
+                    slug: article!.slug,
+                    title: article!.title,
+                    coverUrl: coverUrl || undefined,
+                    categoryName: article!.category?.name,
+                    publishedAt: article!.publishedAt || article!.createdAt,
+                }}
             />
 
             {/* Two Column Layout */}
