@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 interface AuthFormProps {
     type: 'login' | 'register';
-    onSubmit: (data: any) => Promise<void>;
+    onSubmit: (data: Record<string, string>) => Promise<void>;
 }
 
 export default function AuthForm({ type, onSubmit }: AuthFormProps) {
@@ -28,12 +28,17 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
 
         try {
             await onSubmit(formData);
-        } catch (err: any) {
-            setError(err.message || 'An error occurred');
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError('An error occurred');
+            }
         } finally {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="max-w-md w-full mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -114,7 +119,7 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
             <div className="mt-4 text-center text-sm text-gray-600">
                 {type === 'login' ? (
                     <>
-                        Don't have an account?{' '}
+                        Don&apos;t have an account?{' '}
                         <Link href="/auth/register" className="text-blue-600 hover:underline">
                             Register here
                         </Link>

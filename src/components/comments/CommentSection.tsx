@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { createComment, getAuthToken, getMe } from '@/lib/api';
 import type { Comment, User } from '@/types';
 import CommentList from './CommentList';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CommentSectionProps {
     articleId: number;
@@ -17,6 +17,7 @@ export default function CommentSection({ articleId, initialComments }: CommentSe
     const [loading, setLoading] = useState(false);
     const [user, setUser] = useState<User | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const { openAuthModal } = useAuth();
 
     useEffect(() => {
         const checkUser = async () => {
@@ -42,7 +43,6 @@ export default function CommentSection({ articleId, initialComments }: CommentSe
 
         try {
             const createdComment = await createComment(articleId, newComment);
-            // Optimistically add author if missing in response (some Strapi configs don't populate 'author' on create response)
             const commentWithAuthor = {
                 ...createdComment,
                 author: createdComment.author || user || undefined
@@ -90,22 +90,22 @@ export default function CommentSection({ articleId, initialComments }: CommentSe
                 ) : (
                     <div className="bg-gray-50 p-6 rounded-lg text-center">
                         <p className="text-gray-600 mb-4">
-                            Join the discussion! Please log in to leave a comment.
+                            Join the discussion! Please sign in to leave a comment.
                         </p>
                         <div className="space-x-4">
-                            <Link
-                                href="/auth/login"
+                            <button
+                                onClick={() => openAuthModal('login')}
                                 className="text-blue-600 font-medium hover:underline"
                             >
-                                Login
-                            </Link>
+                                Sign In
+                            </button>
                             <span className="text-gray-400">|</span>
-                            <Link
-                                href="/auth/register"
+                            <button
+                                onClick={() => openAuthModal('register')}
                                 className="text-blue-600 font-medium hover:underline"
                             >
-                                Register
-                            </Link>
+                                Create Account
+                            </button>
                         </div>
                     </div>
                 )}

@@ -62,7 +62,6 @@ export function getImageUrl(media?: StrapiMedia, size?: ImageSize): string | nul
  */
 function delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
-    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**
@@ -252,7 +251,7 @@ function buildCategoryTree(categories: Category[]): Category[] {
     categories.forEach(cat => {
         const node = map.get(cat.documentId)!;
         // Check if this category has a parent in our collection
-        const parentId = (cat as any).parent?.documentId;
+        const parentId = (cat as Category & { parent?: { documentId: string } }).parent?.documentId;
 
         if (parentId && map.has(parentId)) {
             map.get(parentId)!.children.push(node);
@@ -331,11 +330,6 @@ export async function getPaginatedArticles(
         total: response.meta?.pagination?.total || response.data.length,
         pageCount: response.meta?.pagination?.pageCount || 1,
     };
-    return {
-        articles: response.data,
-        total: response.meta?.pagination?.total || response.data.length,
-        pageCount: response.meta?.pagination?.pageCount || 1,
-    };
 }
 
 // ============================================================
@@ -375,17 +369,22 @@ export async function register(username: string, email: string, password: string
 }
 
 export async function getMe(): Promise<User> {
-    const response = await fetchAPI<User>('/api/users/me');
-    return response as unknown as User; // users/me returns object, not { data: object } in some Strapi versions, but fetchAPI expects { data }. Adjusting if needed.
-    // Actually standard fetchAPI wraps return in response.json(). 
-    // Strapi /users/me returns the user object directly.
-    // So fetchAPI might fail typing or structure.
-    // Let's use raw fetch for /users/me or handle it. 
-    // For now, let's assume standard wrapper or fix later.
-    // Wait, fetchAPI returns `res.json()`.
-    // If strapi returns direct object, `res.json()` is fine.
-    // But type casting `StrapiResponse<User>` might be wrong.
-    // I'll leave as is for now, but watch out.
+    const token = getAuthToken();
+    if (!token) throw new Error('Not authenticated');
+
+    const res = await fetch(`${STRAPI_API_URL}/api/users/me`, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!res.ok) {
+        throw new ApiError('Failed to fetch user', res.status);
+    }
+
+    // Strapi /users/me returns the user object directly (not wrapped in { data })
+    return res.json();
 }
 
 // ============================================================
