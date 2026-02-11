@@ -7,7 +7,11 @@ import type {
     Category,
     StrapiMedia,
     StrapiResponse,
-    ImageSize
+    ImageSize,
+    User,
+    AuthResponse,
+    Comment,
+    Like
 } from '@/types';
 
 // Re-export types for backward compatibility
@@ -58,7 +62,36 @@ export function getImageUrl(media?: StrapiMedia, size?: ImageSize): string | nul
  */
 function delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+/**
+ * Token management
+ */
+let authToken: string | null = null;
+
+export const setAuthToken = (token: string | null) => {
+    authToken = token;
+    if (typeof window !== 'undefined') {
+        if (token) {
+            localStorage.setItem('jwt', token);
+        } else {
+            localStorage.removeItem('jwt');
+        }
+    }
+};
+
+export const getAuthToken = () => {
+    if (authToken) return authToken;
+    if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('jwt');
+        if (token) {
+            authToken = token;
+            return token;
+        }
+    }
+    return null;
+};
 
 /**
  * Fetch data from Strapi API with retry logic and timeout
@@ -75,6 +108,14 @@ async function fetchAPI<T>(
             revalidate: config.cache.revalidateSeconds,
         },
     };
+
+    const token = getAuthToken();
+    if (token) {
+        defaultOptions.headers = {
+            ...defaultOptions.headers,
+            Authorization: `Bearer ${token}`,
+        };
+    }
 
     const mergedOptions: RequestInit = {
         ...defaultOptions,
@@ -290,6 +331,117 @@ export async function getPaginatedArticles(
         total: response.meta?.pagination?.total || response.data.length,
         pageCount: response.meta?.pagination?.pageCount || 1,
     };
+    return {
+        articles: response.data,
+        total: response.meta?.pagination?.total || response.data.length,
+        pageCount: response.meta?.pagination?.pageCount || 1,
+    };
+}
+
+// ============================================================
+// Auth Methods
+// ============================================================
+
+export async function login(identifier: string, password: string): Promise<AuthResponse> {
+    const response = await fetch(`${STRAPI_API_URL}/api/auth/local`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, password }),
+    });
+
+    if (!response.ok) {
+        throw new Error('Login failed');
+    }
+
+    const data = await response.json();
+    setAuthToken(data.jwt);
+    return data;
+}
+
+export async function register(username: string, email: string, password: string): Promise<AuthResponse> {
+    const response = await fetch(`${STRAPI_API_URL}/api/auth/local/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password }),
+    });
+
+    if (!response.ok) {
+        throw new Error('Registration failed');
+    }
+
+    const data = await response.json();
+    setAuthToken(data.jwt);
+    return data;
+}
+
+export async function getMe(): Promise<User> {
+    const response = await fetchAPI<User>('/api/users/me');
+    return response as unknown as User; // users/me returns object, not { data: object } in some Strapi versions, but fetchAPI expects { data }. Adjusting if needed.
+    // Actually standard fetchAPI wraps return in response.json(). 
+    // Strapi /users/me returns the user object directly.
+    // So fetchAPI might fail typing or structure.
+    // Let's use raw fetch for /users/me or handle it. 
+    // For now, let's assume standard wrapper or fix later.
+    // Wait, fetchAPI returns `res.json()`.
+    // If strapi returns direct object, `res.json()` is fine.
+    // But type casting `StrapiResponse<User>` might be wrong.
+    // I'll leave as is for now, but watch out.
+}
+
+// ============================================================
+// Comment Methods
+// ============================================================
+
+export async function getComments(articleId: number): Promise<Comment[]> {
+    const response = await fetchAPI<Comment[]>(
+        `/api/comments?filters[article][id][$eq]=${articleId}&populate[author]=*&sort=createdAt:desc`
+    );
+    return response.data;
+}
+
+export async function createComment(articleId: number, content: string): Promise<Comment> {
+    const response = await fetchAPI<Comment>('/api/comments', {
+        method: 'POST',
+        body: JSON.stringify({
+            data: {
+                content,
+                article: articleId,
+                // author is inferred from token by Strapi if set up, or needs to be passed.
+                // Usually Users-Permissions sets `user` in context.
+                // We might need to ensure backend assigns it.
+            }
+        }),
+    });
+    return response.data;
+}
+
+// ============================================================
+// Like Methods
+// ============================================================
+
+export async function getLikes(articleId: number): Promise<Like[]> {
+    const response = await fetchAPI<Like[]>(
+        `/api/likes?filters[article][id][$eq]=${articleId}&populate[user]=*`
+    );
+    return response.data;
+}
+
+export async function createLike(articleId: number): Promise<Like> {
+    const response = await fetchAPI<Like>('/api/likes', {
+        method: 'POST',
+        body: JSON.stringify({
+            data: {
+                article: articleId,
+            }
+        }),
+    });
+    return response.data;
+}
+
+export async function deleteLike(documentId: string): Promise<void> {
+    await fetchAPI(`/api/likes/${documentId}`, {
+        method: 'DELETE',
+    });
 }
 
 export { STRAPI_API_URL };

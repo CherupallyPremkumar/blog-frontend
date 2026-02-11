@@ -144,3 +144,44 @@ export interface GroupedArticles {
     date: Date;
     articles: Article[];
 }
+
+// ============================================================
+// User & Interaction Types
+// ============================================================
+
+export interface User {
+    id: number;
+    documentId: string;
+    username: string;
+    email: string;
+    provider: string;
+    confirmed: boolean;
+    blocked: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface AuthResponse {
+    jwt: string;
+    user: User;
+}
+
+export interface Comment {
+    id: number;
+    documentId: string;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+    publishedAt: string | null;
+    author?: User;
+    article?: Article;
+}
+
+export interface Like {
+    id: number;
+    documentId: string;
+    createdAt: string;
+    updatedAt: string;
+    user?: User;
+    article?: Article;
+}

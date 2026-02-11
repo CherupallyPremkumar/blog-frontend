@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getArticleBySlug, getArticles, getImageUrl, ContentBlock } from "@/lib/api";
+import { getArticleBySlug, getArticles, getImageUrl, getComments, getLikes, ContentBlock } from "@/lib/api";
 import { config } from "@/lib/config";
 import ImageLightbox from "@/components/ImageLightbox";
 import RichTextContent from "@/components/RichTextContent";
@@ -10,6 +10,8 @@ import MoreArticles from "@/components/MoreArticles";
 import { PageLayout } from "@/components/Layout";
 import Mermaid from "@/components/Mermaid";
 import PlantUML from "@/components/PlantUML";
+import LikeButton from "@/components/likes/LikeButton";
+import CommentSection from "@/components/comments/CommentSection";
 
 export const revalidate = 3600;
 
@@ -131,6 +133,13 @@ export default async function ArticlePage({ params }: PageProps) {
     // At this point, article is guaranteed to be defined
     const coverUrl = getImageUrl(article!.coverImage, 'large');
 
+    // Fetch interactive data (likes & comments)
+    // We catch errors to ensure the page still loads even if these fail
+    const [initialComments, initialLikes] = await Promise.all([
+        getComments(article!.id).catch(() => []),
+        getLikes(article!.id).catch(() => [])
+    ]);
+
     // Generate JSON-LD structured data
     const jsonLd = {
         "@context": "https://schema.org",
@@ -220,10 +229,15 @@ export default async function ArticlePage({ params }: PageProps) {
                         )}
                     </div>
 
-                    {/* Title */}
-                    <h1 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
-                        {article!.title}
-                    </h1>
+                    {/* Title & Like Button */}
+                    <div className="flex justify-between items-start gap-4 mb-6">
+                        <h1 className="text-4xl font-bold text-gray-900 leading-tight flex-1">
+                            {article!.title}
+                        </h1>
+                        <div className="flex-shrink-0 pt-2">
+                            <LikeButton articleId={article!.id} initialLikes={initialLikes} />
+                        </div>
+                    </div>
 
                     {/* Author */}
                     {article!.author && (
@@ -282,6 +296,8 @@ export default async function ArticlePage({ params }: PageProps) {
                             </p>
                         )}
                     </div>
+
+                    <CommentSection articleId={article!.id} initialComments={initialComments} />
                 </article>
 
                 {/* Sidebar - Sticky */}
