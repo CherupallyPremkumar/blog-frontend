@@ -153,6 +153,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html.dark body {
+  background: #000000 !important;
+}
+
 /* ============================================================
    Typography Enhancements
    ============================================================ */
