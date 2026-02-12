@@ -38,9 +38,29 @@ export default function RichTextContent({ content }: RichTextContentProps) {
             .trim();
     };
 
+    // Track seen IDs for this render to handle duplicates
+    const seenIds = new Map<string, number>();
+
+    const getUniqueId = (text: string) => {
+        let id = text.toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim();
+
+        if (seenIds.has(id)) {
+            const count = seenIds.get(id)!;
+            seenIds.set(id, count + 1);
+            id = `${id}-${count}`;
+        } else {
+            seenIds.set(id, 1);
+        }
+        return id;
+    };
+
     return (
         <>
-            <div className="prose prose-lg max-w-none prose-img:rounded-lg prose-img:shadow-md prose-a:text-blue-600 hover:prose-a:text-blue-800 dark:prose-a:text-blue-400 dark:hover:prose-a:text-blue-300">
+            <div className="prose prose-lg dark:prose-invert max-w-none prose-img:rounded-lg prose-img:shadow-md prose-a:text-blue-600 hover:prose-a:text-blue-800 dark:prose-a:text-blue-400 dark:hover:prose-a:text-blue-300">
                 <ReactMarkdown
                     rehypePlugins={[rehypeRaw]}
                     remarkPlugins={[remarkGfm]}
@@ -48,17 +68,17 @@ export default function RichTextContent({ content }: RichTextContentProps) {
                         // Heading renderers with IDs for ToC
                         h2: ({ children }) => {
                             const text = String(children);
-                            const id = text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
+                            const id = getUniqueId(text);
                             return <h2 id={id} className="scroll-mt-24">{children}</h2>;
                         },
                         h3: ({ children }) => {
                             const text = String(children);
-                            const id = text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
+                            const id = getUniqueId(text);
                             return <h3 id={id} className="scroll-mt-24">{children}</h3>;
                         },
                         // Prevent p tags from wrapping figure elements (causes hydration errors)
                         p: ({ children, ...props }) => {
-                            return <div className="text-gray-900 dark:text-slate-200 leading-relaxed mb-4" {...props}>{children}</div>;
+                            return <div className="text-gray-900 dark:text-white leading-relaxed mb-4" {...props}>{children}</div>;
                         },
                         code({ className, children, ...props }) {
                             const match = /language-(\w+)/.exec(className || "");
@@ -108,10 +128,10 @@ export default function RichTextContent({ content }: RichTextContentProps) {
                         },
 
                         li({ children }) {
-                            return <li className="my-1 text-gray-900 dark:text-slate-200 leading-snug">{children}</li>;
+                            return <li className="my-1 text-gray-900 dark:text-white leading-snug">{children}</li>;
                         },
                         ul({ children }) {
-                            return <ul className="list-disc pl-6 my-2 text-gray-900 dark:text-slate-200 last:mb-0">{children}</ul>;
+                            return <ul className="list-disc pl-6 my-2 text-gray-900 dark:text-white last:mb-0">{children}</ul>;
                         },
                         a({ href, children, ...props }) {
                             // Fix localhost URLs in links

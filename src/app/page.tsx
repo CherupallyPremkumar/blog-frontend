@@ -18,18 +18,18 @@ export default async function Home() {
   return (
     <PageLayout>
       {/* Timeline Header */}
-      <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
-        <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+      <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-neutral-800 pb-4">
+        <h2 className="text-xs font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-widest">
           Timeline
         </h2>
-        <span className="text-xs font-medium px-3 py-1 bg-gray-100 text-gray-600 rounded-full">
+        <span className="text-xs font-medium px-3 py-1 bg-gray-100 dark:bg-neutral-900 text-gray-600 dark:text-neutral-400 rounded-full">
           {articles.length} article{articles.length !== 1 ? 's' : ''}
         </span>
       </div>
 
       {error ? (
         <div
-          className="border border-amber-200 bg-amber-50 p-6 text-center rounded-lg"
+          className="border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 p-6 text-center rounded-lg"
           role="alert"
           aria-live="polite"
         >
@@ -68,8 +68,8 @@ export default async function Home() {
         </div>
       ) : articles.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500 mb-4">No articles yet.</p>
-          <p className="text-sm text-gray-400">
+          <p className="text-gray-500 dark:text-neutral-400 mb-4">No articles yet.</p>
+          <p className="text-sm text-gray-400 dark:text-neutral-500">
             Articles will appear here once published.
           </p>
         </div>

@@ -61,14 +61,14 @@ export default function CommentSection({ articleId, initialComments }: CommentSe
                             <textarea
                                 id="comment"
                                 rows={3}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full p-3 border border-gray-300 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Add to the discussion..."
                                 value={newComment}
                                 onChange={(e) => setNewComment(e.target.value)}
                                 required
                             />
                         </div>
-                        {error && <p className="text-red-600 text-sm">{error}</p>}
+                        {error && <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>}
                         <div className="flex justify-end">
                             <button
                                 type="submit"
@@ -80,21 +80,21 @@ export default function CommentSection({ articleId, initialComments }: CommentSe
                         </div>
                     </form>
                 ) : (
-                    <div className="bg-gray-50 p-6 rounded-lg text-center">
-                        <p className="text-gray-600 mb-4">
+                    <div className="bg-gray-50 dark:bg-neutral-900 p-6 rounded-lg text-center border border-gray-100 dark:border-neutral-800">
+                        <p className="text-gray-600 dark:text-neutral-400 mb-4">
                             Join the discussion! Please sign in to leave a comment.
                         </p>
                         <div className="space-x-4">
                             <button
                                 onClick={() => openAuthModal('login')}
-                                className="text-blue-600 font-medium hover:underline"
+                                className="text-blue-600 dark:text-blue-400 font-medium hover:underline"
                             >
                                 Sign In
                             </button>
-                            <span className="text-gray-400">|</span>
+                            <span className="text-gray-400 dark:text-neutral-500">|</span>
                             <button
                                 onClick={() => openAuthModal('register')}
-                                className="text-blue-600 font-medium hover:underline"
+                                className="text-blue-600 dark:text-blue-400 font-medium hover:underline"
                             >
                                 Create Account
                             </button>

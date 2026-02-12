@@ -18,7 +18,7 @@ export default function CategoryNav({ categories }: CategoryNavProps) {
                         <div key={category.documentId} className="group relative flex-shrink-0">
                             <Link
                                 href={`/category/${category.slug}`}
-                                className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
+                                className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-neutral-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-neutral-800 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
                             >
                                 {category.name}
                                 {hasChildren && (
@@ -31,12 +31,12 @@ export default function CategoryNav({ categories }: CategoryNavProps) {
                             {/* Dropdown - Desktop Only */}
                             {hasChildren && (
                                 <div className="hidden md:block absolute top-full left-0 pt-2 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200 z-50 min-w-[200px]">
-                                    <div className="bg-white rounded-xl shadow-xl border border-gray-100 py-2 overflow-hidden">
+                                    <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-100 dark:border-neutral-800 py-2 overflow-hidden">
                                         {category.children!.map((child) => (
                                             <Link
                                                 key={child.documentId}
                                                 href={`/category/${child.slug}`}
-                                                className="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors"
+                                                className="block px-4 py-2 text-sm text-gray-600 dark:text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors"
                                             >
                                                 {child.name}
                                             </Link>

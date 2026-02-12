@@ -85,7 +85,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             <div className="pt-2 pb-12">
                 {/* Header Section */}
                 <div className="mb-10">
-                    <nav className="mb-6 flex items-center gap-2 text-sm text-gray-500">
+                    <nav className="mb-6 flex items-center gap-2 text-sm text-gray-500 dark:text-neutral-400">
                         <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
                         <span className="opacity-30">/</span>
                         <Link href="/categories" className="hover:text-blue-600 transition-colors">Categories</Link>
@@ -101,11 +101,11 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                             </>
                         )}
                         <span className="opacity-30">/</span>
-                        <span className="text-gray-900 font-medium">{category.name}</span>
+                        <span className="text-gray-900 dark:text-white font-medium">{category.name}</span>
                     </nav>
 
                     <div className="relative">
-                        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
+                        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-4">
                             {category.name}
                         </h1>
                         {category.description && (
@@ -126,8 +126,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                                 <Timeline articles={articles} />
                             </div>
                         ) : (
-                            <div className="py-20 text-center rounded-3xl bg-gray-50/50 border border-dashed border-gray-200">
-                                <p className="text-gray-500">No articles found in this category yet.</p>
+                            <div className="py-20 text-center rounded-3xl bg-gray-50/50 border border-dashed border-gray-200 dark:border-neutral-800">
+                                <p className="text-gray-500 dark:text-neutral-400">No articles found in this category yet.</p>
                                 <Link href="/" className="inline-block mt-4 text-blue-600 font-medium hover:underline">
                                     Back to Home
                                 </Link>

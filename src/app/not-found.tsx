@@ -12,7 +12,7 @@ export default function NotFound() {
                     404
                 </div>
 
-                <h1 className="text-2xl font-bold text-gray-900 mb-3">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
                     Page Not Found
                 </h1>
 
@@ -30,7 +30,7 @@ export default function NotFound() {
                     </Link>
                 </div>
 
-                <p className="mt-8 text-sm text-gray-500">
+                <p className="mt-8 text-sm text-gray-500 dark:text-neutral-400">
                     If you believe this is an error, please try again later.
                 </p>
             </div>

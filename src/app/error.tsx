@@ -44,7 +44,7 @@ export default function Error({ error, reset }: ErrorPageProps) {
                     </svg>
                 </div>
 
-                <h1 className="text-2xl font-bold text-gray-900 mb-3">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
                     Oops! Something went wrong
                 </h1>
 
@@ -56,7 +56,7 @@ export default function Error({ error, reset }: ErrorPageProps) {
                 {process.env.NODE_ENV === "development" && (
                     <div className="mb-6 text-left">
                         <details className="bg-gray-100 rounded-lg p-4">
-                            <summary className="cursor-pointer text-sm font-medium text-gray-700">
+                            <summary className="cursor-pointer text-sm font-medium text-gray-700 dark:text-neutral-300">
                                 Error Details (Development Only)
                             </summary>
                             <pre className="mt-2 text-xs text-red-600 overflow-auto max-h-40 whitespace-pre-wrap">
@@ -64,7 +64,7 @@ export default function Error({ error, reset }: ErrorPageProps) {
                                 {error.stack && `\n\n${error.stack}`}
                             </pre>
                             {error.digest && (
-                                <p className="mt-2 text-xs text-gray-500">
+                                <p className="mt-2 text-xs text-gray-500 dark:text-neutral-400">
                                     Digest: {error.digest}
                                 </p>
                             )}
@@ -90,7 +90,7 @@ export default function Error({ error, reset }: ErrorPageProps) {
                 </div>
 
                 {/* Help text */}
-                <p className="mt-8 text-sm text-gray-500">
+                <p className="mt-8 text-sm text-gray-500 dark:text-neutral-400">
                     If the problem persists, please try refreshing the page or{" "}
                     <a href="mailto:support@example.com" className="text-blue-600 hover:underline">
                         contact support

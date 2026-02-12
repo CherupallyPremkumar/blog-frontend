@@ -16,16 +16,26 @@ export function extractHeadings(content: string): TOCHeading[] {
     const headings: TOCHeading[] = [];
     const regex = /^(#{2,3})\s+(.+)$/gm;
     let match;
+    const seenIds = new Map<string, number>();
 
     while ((match = regex.exec(content)) !== null) {
         const level = match[1].length;
         const text = match[2].trim();
-        const id = text
+        let id = text
             .toLowerCase()
             .replace(/[^a-z0-9\s-]/g, '')
             .replace(/\s+/g, '-')
             .replace(/-+/g, '-')
             .trim();
+
+        // Handle duplicate IDs
+        if (seenIds.has(id)) {
+            const count = seenIds.get(id)!;
+            seenIds.set(id, count + 1);
+            id = `${id}-${count}`;
+        } else {
+            seenIds.set(id, 1);
+        }
 
         headings.push({ id, text, level });
     }

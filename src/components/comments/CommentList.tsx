@@ -73,7 +73,7 @@ export default function CommentList({ comments, onCommentUpdated, onCommentDelet
                                 {comment.author?.username || 'Anonymous'}
                             </div>
                             <div className="flex items-center gap-3">
-                                <span className="text-sm text-gray-500">
+                                <span className="text-sm text-gray-500 dark:text-neutral-400">
                                     {new Date(comment.createdAt).toLocaleDateString()}
                                 </span>
                                 {isOwner && !isEditing && (
