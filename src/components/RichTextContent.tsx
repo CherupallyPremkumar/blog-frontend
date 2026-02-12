@@ -77,8 +77,8 @@ export default function RichTextContent({ content }: RichTextContentProps) {
                             return <h3 id={id} className="scroll-mt-24">{children}</h3>;
                         },
                         // Prevent p tags from wrapping figure elements (causes hydration errors)
-                        p: ({ children, ...props }) => {
-                            return <div className="text-gray-900 dark:text-white leading-relaxed mb-4" {...props}>{children}</div>;
+                        p: ({ children, className, ...props }) => {
+                            return <div className={`text-gray-900 dark:text-gray-100 leading-relaxed mb-4 ${className || ''}`} {...props}>{children}</div>;
                         },
                         code({ className, children, ...props }) {
                             const match = /language-(\w+)/.exec(className || "");
@@ -127,11 +127,11 @@ export default function RichTextContent({ content }: RichTextContentProps) {
                             );
                         },
 
-                        li({ children }) {
-                            return <li className="my-1 text-gray-900 dark:text-white leading-snug">{children}</li>;
+                        li({ children, className, ...props }) {
+                            return <li className={`my-1 text-gray-900 dark:text-gray-100 leading-snug ${className || ''}`} {...props}>{children}</li>;
                         },
-                        ul({ children }) {
-                            return <ul className="list-disc pl-6 my-2 text-gray-900 dark:text-white last:mb-0">{children}</ul>;
+                        ul({ children, className, ...props }) {
+                            return <ul className={`list-disc pl-6 my-2 text-gray-900 dark:text-gray-100 last:mb-0 ${className || ''}`} {...props}>{children}</ul>;
                         },
                         a({ href, children, ...props }) {
                             // Fix localhost URLs in links
