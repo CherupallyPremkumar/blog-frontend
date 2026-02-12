@@ -1,8 +1,8 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { KeepAlive } from "@/components/KeepAlive";
-import { SkipToContent, Header, HeaderSkeleton } from "@/components/Layout";
+import { SkipToContent, Header } from "@/components/Layout";
+import Providers from "@/components/Providers";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -71,11 +71,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-
-  // Verification for search engines (add your own if needed)
-  // verification: {
-  //   google: "your-google-verification-code",
-  // },
 };
 
 export default function RootLayout({
@@ -93,10 +88,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SkipToContent />
-        <KeepAlive />
-        <Header />
-        {children}
+        <Providers>
+          <SkipToContent />
+          <KeepAlive />
+          <Header />
+          {children}
+        </Providers>
       </body>
     </html>
   );

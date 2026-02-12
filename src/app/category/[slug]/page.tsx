@@ -12,10 +12,14 @@ interface CategoryPageProps {
 }
 
 export async function generateStaticParams() {
-    const categories = await getCategories();
-    return categories.map((category) => ({
-        slug: category.slug,
-    }));
+    try {
+        const categories = await getCategories();
+        return categories.map((category) => ({
+            slug: category.slug,
+        }));
+    } catch {
+        return [];
+    }
 }
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
@@ -38,6 +42,9 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 export default async function CategoryPage({ params }: CategoryPageProps) {
     const { slug } = await params;
 
+    let category: Category | undefined;
+    let articles: Article[] = [];
+
     try {
         // Find this category and its parent/children
         const allCategories = await getCategories(true);
@@ -53,121 +60,118 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             }
         };
 
-        const category = findCategory(allCategories, slug);
+        category = findCategory(allCategories, slug);
 
         if (!category) {
             notFound();
         }
 
-        const articles = await getArticlesByCategory(slug);
-
-        return (
-            <PageLayout maxWidth="wide">
-                <div className="pt-2 pb-12">
-                    {/* Header Section */}
-                    <div className="mb-10">
-                        <nav className="mb-6 flex items-center gap-2 text-sm text-gray-500">
-                            <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
-                            <span className="opacity-30">/</span>
-                            <Link href="/categories" className="hover:text-blue-600 transition-colors">Categories</Link>
-                            {category.parent && (
-                                <>
-                                    <span className="opacity-30">/</span>
-                                    <Link
-                                        href={`/category/${category.parent.slug}`}
-                                        className="hover:text-blue-600 transition-colors"
-                                    >
-                                        {category.parent.name}
-                                    </Link>
-                                </>
-                            )}
-                            <span className="opacity-30">/</span>
-                            <span className="text-gray-900 font-medium">{category.name}</span>
-                        </nav>
-
-                        <div className="relative">
-                            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
-                                {category.name}
-                            </h1>
-                            {category.description && (
-                                <p className="text-xl text-gray-600 max-w-3xl leading-relaxed">
-                                    {category.description}
-                                </p>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                        {/* Main Content */}
-                        <div className="lg:col-span-8">
-                            <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-8 border-b border-gray-100 pb-2">Articles</h2>
-
-                            {articles.length > 0 ? (
-                                <div className="pb-20">
-                                    <Timeline articles={articles} />
-                                </div>
-                            ) : (
-                                <div className="py-20 text-center rounded-3xl bg-gray-50/50 border border-dashed border-gray-200">
-                                    <p className="text-gray-500">No articles found in this category yet.</p>
-                                    <Link href="/" className="inline-block mt-4 text-blue-600 font-medium hover:underline">
-                                        Back to Home
-                                    </Link>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Sidebar */}
-                        <div className="lg:col-span-4 space-y-12 sticky top-24 h-fit">
-                            {/* Sub-categories (Explorer) */}
-                            {category.children && category.children.length > 0 && (
-                                <section>
-                                    <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-100 pb-2">
-                                        Explorer
-                                    </h2>
-                                    <div className="flex flex-col gap-3">
-                                        {category.children.map((child: Category) => (
-                                            <Link
-                                                key={child.documentId}
-                                                href={`/category/${child.slug}`}
-                                                className="group flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100 hover:border-blue-200 hover:bg-white hover:shadow-sm transition-all duration-200"
-                                            >
-                                                <span className="font-medium text-gray-700 group-hover:text-blue-600 transition-colors">
-                                                    {child.name}
-                                                </span>
-                                                <svg className="w-4 h-4 text-gray-400 group-hover:text-blue-500 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                                </svg>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </section>
-                            )}
-
-                            {/* View All Categories Link */}
-                            <Link
-                                href="/categories"
-                                className="inline-block text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
-                            >
-                                View All Categories →
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </PageLayout>
-        );
+        articles = await getArticlesByCategory(slug);
     } catch (error) {
         console.error(`Error loading category page for slug "${slug}":`, error);
 
-        // Only trigger notFound() if it's explicitly a 404 or if the category truly doesn't exist
-        // Otherwise rethrow so Next.js handles it as a build error (500)
-        // This prevents suppressing API errors during build
         if (error instanceof Error && (error.message.includes('404') || error.message.includes('NOT_FOUND'))) {
             notFound();
         }
-
-        // If we get here, it's likely an API issue (500, 403, network, etc)
-        // Rethrowing will fail the build for this page, which is what we want
-        // so we can see the actual error instead of a generic 404
         throw error;
     }
+
+    if (!category) {
+        return null;
+    }
+
+    return (
+        <PageLayout maxWidth="wide">
+            <div className="pt-2 pb-12">
+                {/* Header Section */}
+                <div className="mb-10">
+                    <nav className="mb-6 flex items-center gap-2 text-sm text-gray-500">
+                        <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
+                        <span className="opacity-30">/</span>
+                        <Link href="/categories" className="hover:text-blue-600 transition-colors">Categories</Link>
+                        {category.parent && (
+                            <>
+                                <span className="opacity-30">/</span>
+                                <Link
+                                    href={`/category/${category.parent.slug}`}
+                                    className="hover:text-blue-600 transition-colors"
+                                >
+                                    {category.parent.name}
+                                </Link>
+                            </>
+                        )}
+                        <span className="opacity-30">/</span>
+                        <span className="text-gray-900 font-medium">{category.name}</span>
+                    </nav>
+
+                    <div className="relative">
+                        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
+                            {category.name}
+                        </h1>
+                        {category.description && (
+                            <p className="text-xl text-gray-600 max-w-3xl leading-relaxed">
+                                {category.description}
+                            </p>
+                        )}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    {/* Main Content */}
+                    <div className="lg:col-span-8">
+                        <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-8 border-b border-gray-100 pb-2">Articles</h2>
+
+                        {articles.length > 0 ? (
+                            <div className="pb-20">
+                                <Timeline articles={articles} />
+                            </div>
+                        ) : (
+                            <div className="py-20 text-center rounded-3xl bg-gray-50/50 border border-dashed border-gray-200">
+                                <p className="text-gray-500">No articles found in this category yet.</p>
+                                <Link href="/" className="inline-block mt-4 text-blue-600 font-medium hover:underline">
+                                    Back to Home
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Sidebar */}
+                    <div className="lg:col-span-4 space-y-12 sticky top-24 h-fit">
+                        {/* Sub-categories (Explorer) */}
+                        {category.children && category.children.length > 0 && (
+                            <section>
+                                <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-100 pb-2">
+                                    Explorer
+                                </h2>
+                                <div className="flex flex-col gap-3">
+                                    {category.children.map((child: Category) => (
+                                        <Link
+                                            key={child.documentId}
+                                            href={`/category/${child.slug}`}
+                                            className="group flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100 hover:border-blue-200 hover:bg-white hover:shadow-sm transition-all duration-200"
+                                        >
+                                            <span className="font-medium text-gray-700 group-hover:text-blue-600 transition-colors">
+                                                {child.name}
+                                            </span>
+                                            <svg className="w-4 h-4 text-gray-400 group-hover:text-blue-500 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* View All Categories Link */}
+                        <Link
+                            href="/categories"
+                            className="inline-block text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
+                        >
+                            View All Categories →
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        </PageLayout>
+    );
 }

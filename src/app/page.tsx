@@ -1,5 +1,5 @@
 import { getArticles, Article } from "@/lib/api";
-import { config } from "@/lib/config";
+import RetryButton from "@/components/RetryButton";
 import { PageLayout } from "@/components/Layout";
 import { Timeline } from "@/components/Timeline";
 
@@ -48,23 +48,21 @@ export default async function Home() {
               </div>
               <p className="font-medium text-amber-800">Waking up the server...</p>
               <p className="text-sm mt-2 text-amber-700">Our backend is spinning up. This usually takes 30-60 seconds on the free tier.</p>
-              <a
-                href="/"
+              <RetryButton
                 className="mt-4 inline-block px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors"
               >
                 Retry
-              </a>
+              </RetryButton>
             </>
           ) : (
             <>
               <p className="font-medium text-red-700">Unable to load articles</p>
               <p className="text-sm mt-1 text-red-600">{error}</p>
-              <a
-                href="/"
+              <RetryButton
                 className="mt-3 inline-block text-sm text-red-600 underline hover:text-red-800"
               >
                 Try again
-              </a>
+              </RetryButton>
             </>
           )}
         </div>

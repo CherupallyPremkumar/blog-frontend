@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ReactNode } from "react";
 import { config } from "@/lib/config";
 import { getCategories } from "@/lib/api";
 import CategoryNav from "./CategoryNav";
@@ -72,17 +71,15 @@ export function HeaderSkeleton() {
     );
 }
 
-interface FooterProps { }
-
-export function Footer({ }: FooterProps) {
+export function Footer() {
     return (
         <footer className="mt-20 border-t border-gray-100 py-12">
             <div className="mx-auto max-w-6xl px-6 text-center text-sm text-gray-500">
                 <p>© {new Date().getFullYear()} {config.site.author}. All rights reserved.</p>
                 <div className="mt-4 flex justify-center gap-6">
-                    <a href="#" className="hover:text-gray-900 transition-colors">Twitter</a>
-                    <a href="#" className="hover:text-gray-900 transition-colors">GitHub</a>
-                    <a href="#" className="hover:text-gray-900 transition-colors">LinkedIn</a>
+                    <a href="https://x.com/premkumar" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">Twitter</a>
+                    <a href="https://github.com/premkumar" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">GitHub</a>
+                    <a href="https://linkedin.com/in/premkumar" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">LinkedIn</a>
                 </div>
             </div>
         </footer>
@@ -102,7 +99,7 @@ export function PageLayout({
 
     return (
         <div className="min-h-screen bg-white flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
-            <main className={`${maxWidthClass} mx-auto w-full flex-1 px-4 md:px-6 pt-24 md:pt-28 pb-8`}>
+            <main id="main-content" className={`${maxWidthClass} mx-auto w-full flex-1 px-4 md:px-6 pt-24 md:pt-28 pb-8`}>
                 {children}
             </main>
             <Footer />

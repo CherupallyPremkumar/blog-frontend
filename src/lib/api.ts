@@ -7,7 +7,11 @@ import type {
     Category,
     StrapiMedia,
     StrapiResponse,
-    ImageSize
+    ImageSize,
+    User,
+    AuthResponse,
+    Comment,
+    Like
 } from '@/types';
 
 // Re-export types for backward compatibility
@@ -61,6 +65,36 @@ function delay(ms: number): Promise<void> {
 }
 
 /**
+ * Token management
+ */
+let authToken: string | null = null;
+
+export const setAuthToken = (token: string | null) => {
+    authToken = token;
+    if (typeof window !== 'undefined') {
+        if (token) {
+            localStorage.setItem('jwt', token);
+        } else {
+            localStorage.removeItem('jwt');
+        }
+    }
+};
+
+export const getAuthToken = () => {
+    if (authToken) {
+        return authToken;
+    }
+    if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('jwt');
+        if (token) {
+            authToken = token;
+            return token;
+        }
+    }
+    return null;
+};
+
+/**
  * Fetch data from Strapi API with retry logic and timeout
  */
 async function fetchAPI<T>(
@@ -75,6 +109,16 @@ async function fetchAPI<T>(
             revalidate: config.cache.revalidateSeconds,
         },
     };
+
+    const token = getAuthToken();
+    if (token) {
+        defaultOptions.headers = {
+            ...defaultOptions.headers,
+            Authorization: `Bearer ${token}`,
+        };
+    } else {
+        // No token available
+    }
 
     const mergedOptions: RequestInit = {
         ...defaultOptions,
@@ -211,7 +255,7 @@ function buildCategoryTree(categories: Category[]): Category[] {
     categories.forEach(cat => {
         const node = map.get(cat.documentId)!;
         // Check if this category has a parent in our collection
-        const parentId = (cat as any).parent?.documentId;
+        const parentId = (cat as Category & { parent?: { documentId: string } }).parent?.documentId;
 
         if (parentId && map.has(parentId)) {
             map.get(parentId)!.children.push(node);
@@ -290,6 +334,187 @@ export async function getPaginatedArticles(
         total: response.meta?.pagination?.total || response.data.length,
         pageCount: response.meta?.pagination?.pageCount || 1,
     };
+}
+
+// ============================================================
+// Auth Methods
+// ============================================================
+
+export async function login(identifier: string, password: string): Promise<AuthResponse> {
+    const response = await fetch(`${STRAPI_API_URL}/api/auth/local`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, password }),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Login failed');
+    }
+
+    const data = await response.json();
+    setAuthToken(data.jwt);
+    return data;
+}
+
+export async function register(username: string, email: string, password: string): Promise<AuthResponse> {
+    const response = await fetch(`${STRAPI_API_URL}/api/auth/local/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password }),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Registration failed');
+    }
+
+    const data = await response.json();
+    setAuthToken(data.jwt);
+    return data;
+}
+
+export async function getMe(): Promise<User> {
+    const token = getAuthToken();
+    if (!token) throw new Error('Not authenticated');
+
+    const res = await fetch(`${STRAPI_API_URL}/api/users/me?populate=avatar`, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!res.ok) {
+        throw new ApiError('Failed to fetch user', res.status);
+    }
+
+    // Strapi /users/me returns the user object directly (not wrapped in { data })
+    return res.json();
+}
+
+export async function updateProfile(bio?: string, avatar?: File): Promise<User> {
+    const token = getAuthToken();
+    if (!token) throw new Error('Not authenticated');
+
+    const formData = new FormData();
+    if (bio !== undefined) {
+        formData.append('bio', bio);
+    }
+    if (avatar) {
+        formData.append('files.avatar', avatar);
+    }
+
+    const res = await fetch(`${STRAPI_API_URL}/api/profile`, {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            // Do NOT set Content-Type — browser sets it with boundary for multipart
+        },
+        body: formData,
+    });
+
+    if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        throw new ApiError(err?.error?.message || 'Failed to update profile', res.status);
+    }
+
+    return res.json();
+}
+
+export async function getMyLikedArticles(): Promise<Article[]> {
+    const token = getAuthToken();
+    if (!token) throw new Error('Not authenticated');
+
+    const res = await fetch(`${STRAPI_API_URL}/api/profile/liked-articles`, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!res.ok) {
+        throw new ApiError('Failed to fetch liked articles', res.status);
+    }
+
+    const data = await res.json();
+    return data.data;
+}
+
+// ============================================================
+// Profile Methods (above) ↑
+// ============================================================
+
+// ============================================================
+// Comment Methods
+// ============================================================
+
+export async function getComments(articleId: number): Promise<Comment[]> {
+    const response = await fetchAPI<Comment[]>(
+        `/api/comments?filters[article][id][$eq]=${articleId}&populate[author]=*&sort=createdAt:desc`
+    );
+    return response.data;
+}
+
+export async function createComment(articleId: number, content: string): Promise<Comment> {
+    const response = await fetchAPI<Comment>('/api/comments', {
+        method: 'POST',
+        body: JSON.stringify({
+            data: {
+                content,
+                article: articleId,
+                // author is inferred from token by Strapi if set up, or needs to be passed.
+                // Usually Users-Permissions sets `user` in context.
+                // We might need to ensure backend assigns it.
+            }
+        }),
+    });
+    return response.data;
+}
+
+export async function updateComment(documentId: string, content: string): Promise<Comment> {
+    const response = await fetchAPI<Comment>(`/api/comments/${documentId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            data: { content }
+        }),
+    });
+    return response.data;
+}
+
+export async function deleteComment(documentId: string): Promise<void> {
+    await fetchAPI(`/api/comments/${documentId}`, {
+        method: 'DELETE',
+    });
+}
+
+// ============================================================
+// Like Methods
+// ============================================================
+
+export async function getLikes(articleId: number): Promise<Like[]> {
+    const response = await fetchAPI<Like[]>(
+        `/api/likes?filters[article][id][$eq]=${articleId}&populate[user]=*`
+    );
+    return response.data;
+}
+
+export async function createLike(articleId: number): Promise<Like> {
+    const response = await fetchAPI<Like>('/api/likes', {
+        method: 'POST',
+        body: JSON.stringify({
+            data: {
+                article: articleId,
+            }
+        }),
+    });
+    return response.data;
+}
+
+export async function deleteLike(documentId: string): Promise<void> {
+    await fetchAPI(`/api/likes/${documentId}`, {
+        method: 'DELETE',
+    });
 }
 
 export { STRAPI_API_URL };
