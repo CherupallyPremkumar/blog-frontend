@@ -7,8 +7,6 @@
    ============================================================ */
 
 :root {
-  color-scheme: light;
-
   /* Colors - Light Mode */
   --color-background: #ffffff;
   --color-foreground: #171717;
@@ -155,6 +153,16 @@ body {
 
 html.dark body {
   background: #000000 !important;
+  color: #ededed !important;
+}
+
+/* Force specific elements to be visible in dark mode */
+html.dark p,
+html.dark li,
+html.dark ul,
+html.dark span,
+html.dark div {
+  color: inherit;
 }
 
 /* ============================================================
