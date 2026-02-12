@@ -402,7 +402,7 @@ export async function updateProfile(bio?: string, avatar?: File): Promise<User> 
         formData.append('bio', bio);
     }
     if (avatar) {
-        formData.append('files.avatar', avatar);
+        formData.append('avatar', avatar);
     }
 
     const res = await fetch(`${STRAPI_API_URL}/api/profile`, {
