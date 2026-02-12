@@ -27,7 +27,7 @@ const PlantUML: React.FC<PlantUMLProps> = ({ puml }) => {
             <img
                 src={src}
                 alt="PlantUML Diagram"
-                className="max-w-full h-auto rounded-lg shadow-sm bg-white p-4 border border-gray-100"
+                className="max-w-full h-auto rounded-lg shadow-sm bg-white p-4 border border-gray-100 dark:border-neutral-800"
                 loading="lazy"
             />
         </figure>

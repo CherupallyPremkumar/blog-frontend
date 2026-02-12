@@ -16,7 +16,12 @@ const nextConfig: NextConfig = {
         port: strapiPort,
         pathname: '/uploads/**',
       },
-      // Allow any HTTPS domain for production flexibility
+      // specific allowance for Cloudinary
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+      // Allow any HTTPS domain with /uploads/ path (e.g. self-hosted Strapi)
       {
         protocol: 'https',
         hostname: '**',

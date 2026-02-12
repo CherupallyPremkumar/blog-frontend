@@ -27,7 +27,7 @@ export function BackendSpinning({ onRetry }: BackendSpinningProps) {
             <div className="text-center p-8 max-w-md">
                 <div className="mb-6">
                     <svg
-                        className="animate-spin h-12 w-12 text-gray-900 mx-auto"
+                        className="animate-spin h-12 w-12 text-gray-900 dark:text-white mx-auto"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -48,7 +48,7 @@ export function BackendSpinning({ onRetry }: BackendSpinningProps) {
                     </svg>
                 </div>
 
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                     Waking up the server...
                 </h2>
 
@@ -56,8 +56,8 @@ export function BackendSpinning({ onRetry }: BackendSpinningProps) {
                     Our backend is spinning up. This usually takes a few seconds on the free tier.
                 </p>
 
-                <div className="text-sm text-gray-500">
-                    Auto-retry in <span className="font-mono font-bold text-gray-900">{countdown}</span> seconds
+                <div className="text-sm text-gray-500 dark:text-neutral-400">
+                    Auto-retry in <span className="font-mono font-bold text-gray-900 dark:text-white">{countdown}</span> seconds
                 </div>
 
                 <button

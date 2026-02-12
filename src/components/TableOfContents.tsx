@@ -59,10 +59,10 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
         <>
             {/* Desktop: Vertical list */}
             <nav className="hidden lg:block" aria-label="Table of contents">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-slate-500 mb-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-neutral-500 mb-3">
                     On this page
                 </h3>
-                <ul className="space-y-1 border-l-2 border-gray-100 dark:border-slate-700">
+                <ul className="space-y-1 border-l-2 border-gray-100 dark:border-neutral-800">
                     {headings.map(({ id, text, level }) => (
                         <li key={id}>
                             <button
@@ -70,7 +70,7 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
                                 className={`block w-full text-left text-sm py-1 transition-all duration-150 border-l-2 -ml-[2px] ${level === 3 ? 'pl-6' : 'pl-3'
                                     } ${activeId === id
                                         ? 'border-blue-500 text-blue-600 dark:text-blue-400 font-medium'
-                                        : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200 hover:border-gray-300 dark:hover:border-slate-500'
+                                        : 'border-transparent text-gray-500 dark:text-neutral-400 hover:text-gray-900 dark:hover:text-neutral-200 hover:border-gray-300 dark:hover:border-neutral-500'
                                     }`}
                             >
                                 {text}
@@ -84,7 +84,7 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
             <div className="lg:hidden mb-6">
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="flex items-center justify-between w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-300 border border-gray-200 dark:border-slate-700"
+                    className="flex items-center justify-between w-full px-4 py-3 bg-gray-50 dark:bg-neutral-900 rounded-xl text-sm font-medium text-gray-700 dark:text-neutral-300 border border-gray-200 dark:border-neutral-800"
                 >
                     <span>📑 Table of Contents</span>
                     <svg
@@ -97,12 +97,12 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
                     </svg>
                 </button>
                 {isOpen && (
-                    <ul className="mt-2 bg-gray-50 dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 px-4 py-2 space-y-1">
+                    <ul className="mt-2 bg-gray-50 dark:bg-neutral-900 rounded-xl border border-gray-200 dark:border-neutral-800 px-4 py-2 space-y-1">
                         {headings.map(({ id, text, level }) => (
                             <li key={id}>
                                 <button
                                     onClick={() => scrollToHeading(id)}
-                                    className={`block w-full text-left text-sm py-1.5 text-gray-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors ${level === 3 ? 'pl-4' : ''
+                                    className={`block w-full text-left text-sm py-1.5 text-gray-600 dark:text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors ${level === 3 ? 'pl-4' : ''
                                         } ${activeId === id ? 'text-blue-600 dark:text-blue-400 font-medium' : ''}`}
                                 >
                                     {text}

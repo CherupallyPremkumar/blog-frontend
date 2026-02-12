@@ -158,9 +158,25 @@ export default async function ArticlePage({ params }: PageProps) {
     ]);
 
     // Extract headings for Table of Contents
-    const allHeadings = (article!.blocks || [])
+    const rawHeadings = (article!.blocks || [])
         .filter((b): b is ContentBlock & { content: string } => b.__component === 'blocks.rich-text' && 'content' in b && typeof b.content === 'string')
         .flatMap(b => extractHeadings(b.content));
+
+    // Deduplicate IDs across all blocks to prevent key errors
+    const seenHeadingIds = new Set<string>();
+    const allHeadings = rawHeadings.map(heading => {
+        let id = heading.id;
+        // If ID matches an existing one, append a counter until unique
+        if (seenHeadingIds.has(id)) {
+            let counter = 1;
+            while (seenHeadingIds.has(`${id}-${counter}`)) {
+                counter++;
+            }
+            id = `${id}-${counter}`;
+        }
+        seenHeadingIds.add(id);
+        return { ...heading, id };
+    });
 
     // Calculate reading time
     const readingTime = getReadingTime(article!.blocks || []);
@@ -218,7 +234,9 @@ export default async function ArticlePage({ params }: PageProps) {
 
             {/* Mobile Table of Contents */}
             {allHeadings.length > 0 && (
-                <TableOfContents headings={allHeadings} />
+                <div className="lg:hidden">
+                    <TableOfContents headings={allHeadings} />
+                </div>
             )}
 
             {/* Two Column Layout */}
@@ -226,7 +244,7 @@ export default async function ArticlePage({ params }: PageProps) {
                 {/* Article - Scrollable */}
                 <article id="main-content" className="flex-1 min-w-0 pt-6">
                     {/* Breadcrumbs */}
-                    <nav className="mb-6 flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400 overflow-x-auto whitespace-nowrap pb-2 scrollbar-none">
+                    <nav className="mb-6 flex items-center gap-2 text-sm text-gray-500 dark:text-neutral-400 overflow-x-auto whitespace-nowrap pb-2 scrollbar-none">
                         <Link href="/" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Home</Link>
                         <span className="opacity-30">/</span>
                         <Link href="/categories" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Categories</Link>
@@ -253,11 +271,11 @@ export default async function ArticlePage({ params }: PageProps) {
                             </>
                         )}
                         <span className="opacity-30">/</span>
-                        <span className="text-gray-900 dark:text-slate-200 font-medium truncate">{article!.title}</span>
+                        <span className="text-gray-900 dark:text-white font-medium truncate">{article!.title}</span>
                     </nav>
 
                     {/* Meta */}
-                    <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-slate-400 mb-4">
+                    <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-neutral-400 mb-4">
                         {article!.category && (
                             <span className="uppercase text-xs tracking-wide">
                                 {article!.category.name}
@@ -289,8 +307,8 @@ export default async function ArticlePage({ params }: PageProps) {
 
                     {/* Author */}
                     {article!.author && (
-                        <div className="flex items-center gap-3 mb-8 pb-8 border-b border-gray-200 dark:border-slate-700">
-                            <div className="w-10 h-10 bg-gray-200 dark:bg-slate-700 rounded-full flex items-center justify-center text-sm font-medium text-gray-600 dark:text-slate-300 overflow-hidden">
+                        <div className="flex items-center gap-3 mb-8 pb-8 border-b border-gray-200 dark:border-neutral-800">
+                            <div className="w-10 h-10 bg-gray-200 dark:bg-neutral-800 rounded-full flex items-center justify-center text-sm font-medium text-gray-600 dark:text-neutral-300 overflow-hidden">
                                 {article!.author.avatar ? (
                                     <Image
                                         src={getImageUrl(article!.author.avatar, 'thumbnail') || ''}
@@ -304,11 +322,11 @@ export default async function ArticlePage({ params }: PageProps) {
                                 )}
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-gray-700 dark:text-slate-300">
+                                <p className="text-sm font-medium text-gray-700 dark:text-neutral-300">
                                     {article!.author.name}
                                 </p>
                                 {article!.author.bio && (
-                                    <p className="text-sm text-gray-500 dark:text-slate-400">
+                                    <p className="text-sm text-gray-500 dark:text-neutral-400">
                                         {article!.author.bio}
                                     </p>
                                 )}
@@ -319,7 +337,7 @@ export default async function ArticlePage({ params }: PageProps) {
                     {/* Cover Image */}
                     {coverUrl && (
                         <figure className="mb-8">
-                            <div className="relative w-full aspect-video bg-gray-100 dark:bg-slate-800">
+                            <div className="relative w-full aspect-video bg-gray-100 dark:bg-neutral-900">
                                 <Image
                                     src={coverUrl}
                                     alt={article!.coverImage?.alternativeText || article!.title}
@@ -339,7 +357,7 @@ export default async function ArticlePage({ params }: PageProps) {
                                 <BlockRenderer key={block.id || index} block={block} />
                             ))
                         ) : (
-                            <p className="text-gray-500 dark:text-slate-400 italic">
+                            <p className="text-gray-500 dark:text-neutral-400 italic">
                                 No content yet.
                             </p>
                         )}
@@ -363,7 +381,7 @@ export default async function ArticlePage({ params }: PageProps) {
             </div>
 
             {/* Mobile More Articles */}
-            <div className="lg:hidden mt-12 pt-12 border-t border-gray-100 dark:border-slate-800">
+            <div className="lg:hidden mt-12 pt-12 border-t border-gray-100 dark:border-neutral-900">
                 <MoreArticles currentSlug={slug} />
             </div>
         </PageLayout>
@@ -405,13 +423,13 @@ function BlockRenderer({ block }: { block: ContentBlock }) {
 
             return (
                 <div className="my-6">
-                    <pre className="bg-gray-100 dark:bg-slate-800 p-4 overflow-x-auto border border-gray-200 dark:border-slate-700 rounded-lg">
-                        <code className="text-sm font-mono text-gray-800 dark:text-slate-200">
+                    <pre className="bg-gray-100 dark:bg-neutral-900 p-4 overflow-x-auto border border-gray-200 dark:border-neutral-800 rounded-lg">
+                        <code className="text-sm font-mono text-gray-800 dark:text-neutral-200">
                             {block.code}
                         </code>
                     </pre>
                     {block.language && (
-                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{block.language}</p>
+                        <p className="text-xs text-gray-500 dark:text-neutral-400 mt-1">{block.language}</p>
                     )}
                 </div>
             );

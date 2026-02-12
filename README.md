@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎨 Personal Blog Frontend
 
-## Getting Started
+A modern, high-performance blog frontend built with **Next.js 14**, **Tailwind CSS v4**, and **TypeScript**. Designed for speed, aesthetics, and a seamless reading experience.
 
-First, run the development server:
+## ✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **⚡️ Next.js 14 App Router**: Server Components, streaming, and optimized rendering.
+- **🌗 Dark Mode**: System-aware theme switching with persistent user preference (localStorage).
+- **📝 Rich Content**: Renders Markdown/Blocks from Strapi, including code blocks, images, and nested lists.
+- **📑 Table of Contents**: Auto-generated sticky sidebar with active scroll highlighting.
+- **📊 Reading Progress**: Visual progress bar for long articles.
+- **🖼️ Image Optimization**: Supports Strapi & Cloudinary with Next.js Image component (AVIF/WebP).
+- **🔐 User Authentication**: Login/Register modal, JWT storage, profile management.
+- **👤 User Profiles**: Edit bio, upload avatar, view liked/recent articles.
+- **💬 Comments & Likes**: Interactive features for logged-in users.
+- **📱 Responsive**: Fully mobile-optimized layout with collapsible navigation.
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4, CSS Variables
+- **Icons**: Lucide React
+- **State**: React Context (Auth, Theme)
+- **Data Fetching**: Native `fetch` with caching/revalidation
+- **Backend**: Strapi v5 (Headless CMS)
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <repo-url>
+   cd frontend
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Configure environment variables:
+   Copy `.env.example` to `.env.local` and update values:
+   ```bash
+   cp .env.example .env.local
+   ```
+   
+   **Required Variables:**
+   ```env
+   NEXT_PUBLIC_STRAPI_API_URL=https://api.yourdomain.com
+   NEXT_PUBLIC_SITE_URL=https://yourdomain.com
+   ```
+
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 📜 Scripts
+
+- `npm run dev`: Start development server (Turbopack enabled)
+- `npm run build`: Build for production
+- `npm start`: Start production server
+- `npm run lint`: Run ESLint
+
+## 📂 Project Structure
+
+```
+src/
+├── app/              # App Router pages & layouts
+├── components/       # Reusable UI components
+│   ├── auth/         # Auth forms & modals
+│   ├── blog/         # Blog-specific components
+│   ├── comments/     # Comment section logic
+│   ├── header/       # Header & Navigation
+│   └── ...
+├── contexts/         # React Context providers (Auth, Theme)
+├── lib/              # Utilities (API, Config, Security)
+└── types/            # TypeScript definitions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎨 Theme Configuration
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Themes are handled via `src/contexts/ThemeContext.tsx` and `src/app/globals.css`.
+- **Light**: Uses `bg-white`, `text-gray-900`
+- **Dark**: Uses custom CSS variables `--background: #000000`, `--foreground: #ffffff`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🔒 Authentication
 
-## Learn More
+Authentication is handled via JWT tokens stored in `localStorage` (via `src/lib/api.ts`).
+- `AuthProvider` manages user session state.
+- `AuthModal` handles login/register flows without page redirects.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built with ❤️ by Prem Kumar

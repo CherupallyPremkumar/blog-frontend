@@ -142,7 +142,7 @@ export default function ProfilePage() {
                                 className="object-cover"
                             />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center text-3xl text-gray-400">
+                            <div className="w-full h-full flex items-center justify-center text-3xl text-gray-400 dark:text-neutral-500">
                                 {user.username.charAt(0).toUpperCase()}
                             </div>
                         )}
@@ -151,7 +151,7 @@ export default function ProfilePage() {
                         </div>
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">{user.username}</h1>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user.username}</h1>
                         <p className="text-gray-500 text-sm">{user.email}</p>
                         <p className="text-gray-400 text-xs mt-1">
                             Member since {new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
@@ -224,7 +224,7 @@ export default function ProfilePage() {
                                 <div className="animate-spin h-6 w-6 border-2 border-blue-600 border-t-transparent rounded-full" />
                             </div>
                         ) : likedArticles.length === 0 ? (
-                            <div className="text-center py-12 text-gray-500">
+                            <div className="text-center py-12 text-gray-500 dark:text-neutral-400">
                                 <div className="text-4xl mb-3">❤️</div>
                                 <p className="font-medium">No liked articles yet</p>
                                 <p className="text-sm mt-1">Articles you like will appear here.</p>
@@ -245,7 +245,7 @@ export default function ProfilePage() {
                 {activeTab === 'recent' && (
                     <div>
                         {recentArticles.length === 0 ? (
-                            <div className="text-center py-12 text-gray-500">
+                            <div className="text-center py-12 text-gray-500 dark:text-neutral-400">
                                 <div className="text-4xl mb-3">🕐</div>
                                 <p className="font-medium">No recently viewed articles</p>
                                 <p className="text-sm mt-1">Articles you visit will appear here.</p>
@@ -262,7 +262,7 @@ export default function ProfilePage() {
                                         className="flex items-center gap-4 p-4 rounded-lg border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition group"
                                     >
                                         {article.coverUrl && (
-                                            <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                                            <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-neutral-900">
                                                 <Image
                                                     src={article.coverUrl}
                                                     alt={article.title}
@@ -272,7 +272,7 @@ export default function ProfilePage() {
                                             </div>
                                         )}
                                         <div className="min-w-0 flex-1">
-                                            <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition truncate">
+                                            <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 transition truncate">
                                                 {article.title}
                                             </h3>
                                             <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
@@ -303,7 +303,7 @@ function ArticleCard({ article }: { article: Article }) {
             className="flex items-center gap-4 p-4 rounded-lg border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition group"
         >
             {coverUrl && (
-                <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-neutral-900">
                     <Image
                         src={coverUrl}
                         alt={article.title}
@@ -313,7 +313,7 @@ function ArticleCard({ article }: { article: Article }) {
                 </div>
             )}
             <div className="min-w-0 flex-1">
-                <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition truncate">
+                <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 transition truncate">
                     {article.title}
                 </h3>
                 <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">

@@ -49,12 +49,20 @@ export class ApiError extends Error {
 export function getImageUrl(media?: StrapiMedia, size?: ImageSize): string | null {
     if (!media) return null;
 
+    // Helper to format URL
+    const formatUrl = (url: string) => {
+        if (url.startsWith('http') || url.startsWith('//')) {
+            return url;
+        }
+        return `${STRAPI_API_URL}${url}`;
+    };
+
     // Try to get the requested size, fallback to original
     if (size && media.formats?.[size]) {
-        return `${STRAPI_API_URL}${media.formats[size].url}`;
+        return formatUrl(media.formats[size].url);
     }
 
-    return `${STRAPI_API_URL}${media.url}`;
+    return formatUrl(media.url);
 }
 
 /**
@@ -402,7 +410,7 @@ export async function updateProfile(bio?: string, avatar?: File): Promise<User> 
         formData.append('bio', bio);
     }
     if (avatar) {
-        formData.append('files.avatar', avatar);
+        formData.append('avatar', avatar);
     }
 
     const res = await fetch(`${STRAPI_API_URL}/api/profile`, {
