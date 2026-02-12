@@ -5,12 +5,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { getImageUrl } from '@/lib/api';
 
 export default function HeaderContent() {
     const pathname = usePathname();
     const isHome = pathname === '/';
     const { user, isLoading, openAuthModal, logout } = useAuth();
+    const { resolvedTheme, toggleTheme } = useTheme();
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -39,12 +41,40 @@ export default function HeaderContent() {
             {!isHome && (
                 <Link
                     href="/"
-                    className="group flex items-center gap-1.5 rounded-full bg-gray-100/50 px-4 py-1.5 text-sm font-medium text-gray-600 transition-all hover:bg-gray-100 hover:text-gray-900"
+                    className="group flex items-center gap-1.5 rounded-full bg-gray-100/50 dark:bg-slate-800/50 px-4 py-1.5 text-sm font-medium text-gray-600 dark:text-slate-300 transition-all hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-white"
                 >
                     <span className="transition-transform group-hover:-translate-x-0.5">←</span>
                     Back to Timeline
                 </Link>
             )}
+
+            {/* Dark Mode Toggle */}
+            <button
+                onClick={toggleTheme}
+                className="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100/50 dark:bg-slate-800/50 text-gray-600 dark:text-slate-300 transition-all hover:bg-gray-200 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-white"
+                aria-label={resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                title={resolvedTheme === 'dark' ? 'Light mode' : 'Dark mode'}
+            >
+                {resolvedTheme === 'dark' ? (
+                    // Sun icon
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-[18px] h-[18px]">
+                        <circle cx="12" cy="12" r="5" />
+                        <line x1="12" y1="1" x2="12" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="23" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                        <line x1="1" y1="12" x2="3" y2="12" />
+                        <line x1="21" y1="12" x2="23" y2="12" />
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                    </svg>
+                ) : (
+                    // Moon icon
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-[18px] h-[18px]">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                    </svg>
+                )}
+            </button>
 
             {!isLoading && (
                 <>
@@ -53,7 +83,7 @@ export default function HeaderContent() {
                             {/* Avatar button */}
                             <button
                                 onClick={() => setMenuOpen(!menuOpen)}
-                                className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-transparent hover:border-blue-400 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-transparent hover:border-blue-400 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
                                 aria-label="Profile menu"
                             >
                                 {avatarUrl ? (
@@ -72,13 +102,13 @@ export default function HeaderContent() {
 
                             {/* Dropdown menu */}
                             {menuOpen && (
-                                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
                                     {/* User info */}
-                                    <div className="px-4 py-2 border-b border-gray-100">
-                                        <p className="text-sm font-medium text-gray-900 truncate">
+                                    <div className="px-4 py-2 border-b border-gray-100 dark:border-slate-700">
+                                        <p className="text-sm font-medium text-gray-900 dark:text-slate-100 truncate">
                                             {user.username}
                                         </p>
-                                        <p className="text-xs text-gray-500 truncate">
+                                        <p className="text-xs text-gray-500 dark:text-slate-400 truncate">
                                             {user.email}
                                         </p>
                                     </div>
@@ -86,19 +116,19 @@ export default function HeaderContent() {
                                     {/* Menu items */}
                                     <Link
                                         href="/profile"
-                                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                                     >
                                         <span className="text-base">👤</span>
                                         My Profile
                                     </Link>
 
-                                    <div className="border-t border-gray-100 mt-1 pt-1">
+                                    <div className="border-t border-gray-100 dark:border-slate-700 mt-1 pt-1">
                                         <button
                                             onClick={() => {
                                                 setMenuOpen(false);
                                                 logout();
                                             }}
-                                            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                                         >
                                             <span className="text-base">🚪</span>
                                             Sign Out

@@ -89,7 +89,42 @@
   --z-tooltip: 70;
 }
 
-/* Dark Mode Removed to enforce Light Theme by default */
+/* ============================================================
+   Dark Mode Colors
+   ============================================================ */
+
+html.dark {
+  --color-background: #0f172a;
+  --color-foreground: #e2e8f0;
+  --color-muted: #94a3b8;
+  --color-muted-foreground: #64748b;
+
+  /* Primary Colors */
+  --color-primary: #60a5fa;
+  --color-primary-hover: #93bbfd;
+  --color-primary-muted: #1e3a5f;
+
+  /* Accent Colors */
+  --color-accent: #1e293b;
+  --color-accent-foreground: #cbd5e1;
+
+  /* Status Colors */
+  --color-success: #4ade80;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  --color-info: #60a5fa;
+
+  /* Border Colors */
+  --color-border: #334155;
+  --color-border-hover: #475569;
+
+  /* Shadows (darker for dark mode) */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+
+  color-scheme: dark;
+}
 
 /* ============================================================
    Tailwind Theme Inline Customization
@@ -135,6 +170,66 @@ body {
 
 .prose a:hover {
   color: var(--color-primary-hover);
+}
+
+/* Dark mode prose overrides */
+html.dark .prose {
+  --tw-prose-body: var(--color-foreground);
+  --tw-prose-headings: #f1f5f9;
+  --tw-prose-links: var(--color-primary);
+  --tw-prose-code: #e2e8f0;
+  --tw-prose-quotes: #94a3b8;
+  --tw-prose-counters: #94a3b8;
+  --tw-prose-bullets: #64748b;
+  --tw-prose-hr: #334155;
+  --tw-prose-th-borders: #334155;
+  --tw-prose-td-borders: #1e293b;
+}
+
+html.dark .prose pre {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+html.dark .prose code {
+  color: #e2e8f0;
+}
+
+/* Dark mode auth modal */
+html.dark .auth-modal {
+  background: #1e293b;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+html.dark .auth-modal-tabs {
+  border-bottom-color: var(--color-border);
+}
+
+html.dark .auth-modal-tab {
+  color: var(--color-muted);
+}
+
+html.dark .auth-modal-tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+html.dark .auth-modal-error {
+  background: #3b1a1a;
+  color: #fca5a5;
+  border-color: #7f1d1d;
+}
+
+html.dark .auth-modal-field input {
+  background: #0f172a;
+  border-color: var(--color-border);
+  color: var(--color-foreground);
+}
+
+html.dark .auth-modal-field input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-muted);
 }
 
 /* ============================================================

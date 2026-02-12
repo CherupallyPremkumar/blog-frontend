@@ -13,6 +13,9 @@ import PlantUML from "@/components/PlantUML";
 import LikeButton from "@/components/likes/LikeButton";
 import CommentSection from "@/components/comments/CommentSection";
 import RecentlyViewedTracker from "@/components/RecentlyViewedTracker";
+import TableOfContents from "@/components/TableOfContents";
+import { extractHeadings } from "@/lib/toc-utils";
+import ReadingProgress from "@/components/ReadingProgress";
 
 export const revalidate = 3600;
 
@@ -92,6 +95,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
 }
 
+// Extract reading time from content
+function getReadingTime(blocks: ContentBlock[]): number {
+    let wordCount = 0;
+    for (const block of blocks) {
+        if (block.__component === 'blocks.rich-text' && block.content) {
+            wordCount += block.content.split(/\s+/).length;
+        }
+        if (block.__component === 'blocks.code-block' && block.code) {
+            wordCount += block.code.split(/\s+/).length;
+        }
+    }
+    return Math.max(1, Math.ceil(wordCount / 200));
+}
+
 export default async function ArticlePage({ params }: PageProps) {
     const { slug } = await params;
 
@@ -114,9 +131,9 @@ export default async function ArticlePage({ params }: PageProps) {
         return (
             <PageLayout>
                 <div className="max-w-3xl mx-auto py-12 px-4">
-                    <div className="border border-amber-200 bg-amber-50 p-8 text-center rounded-2xl shadow-sm">
-                        <h2 className="text-xl font-bold text-amber-900 mb-2">Server Error</h2>
-                        <p className="text-amber-800 mb-6">
+                    <div className="border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 p-8 text-center rounded-2xl shadow-sm">
+                        <h2 className="text-xl font-bold text-amber-900 dark:text-amber-200 mb-2">Server Error</h2>
+                        <p className="text-amber-800 dark:text-amber-300 mb-6">
                             Unable to load this article. The backend might be starting up.
                         </p>
                         <a
@@ -135,11 +152,18 @@ export default async function ArticlePage({ params }: PageProps) {
     const coverUrl = getImageUrl(article!.coverImage, 'large');
 
     // Fetch interactive data (likes & comments)
-    // We catch errors to ensure the page still loads even if these fail
     const [initialComments, initialLikes] = await Promise.all([
         getComments(article!.id).catch(() => []),
         getLikes(article!.id).catch(() => [])
     ]);
+
+    // Extract headings for Table of Contents
+    const allHeadings = (article!.blocks || [])
+        .filter((b): b is ContentBlock & { content: string } => b.__component === 'blocks.rich-text' && 'content' in b && typeof b.content === 'string')
+        .flatMap(b => extractHeadings(b.content));
+
+    // Calculate reading time
+    const readingTime = getReadingTime(article!.blocks || []);
 
     // Generate JSON-LD structured data
     const jsonLd = {
@@ -170,6 +194,9 @@ export default async function ArticlePage({ params }: PageProps) {
 
     return (
         <PageLayout maxWidth="wide">
+            {/* Reading Progress Bar */}
+            <ReadingProgress />
+
             {/* JSON-LD Structured Data */}
             <script
                 type="application/ld+json"
@@ -189,21 +216,26 @@ export default async function ArticlePage({ params }: PageProps) {
                 }}
             />
 
+            {/* Mobile Table of Contents */}
+            {allHeadings.length > 0 && (
+                <TableOfContents headings={allHeadings} />
+            )}
+
             {/* Two Column Layout */}
             <div className="flex gap-8 flex-1">
                 {/* Article - Scrollable */}
                 <article id="main-content" className="flex-1 min-w-0 pt-6">
                     {/* Breadcrumbs */}
-                    <nav className="mb-6 flex items-center gap-2 text-sm text-gray-500 overflow-x-auto whitespace-nowrap pb-2 scrollbar-none">
-                        <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
+                    <nav className="mb-6 flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400 overflow-x-auto whitespace-nowrap pb-2 scrollbar-none">
+                        <Link href="/" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Home</Link>
                         <span className="opacity-30">/</span>
-                        <Link href="/categories" className="hover:text-blue-600 transition-colors">Categories</Link>
+                        <Link href="/categories" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Categories</Link>
                         {article!.category?.parent && (
                             <>
                                 <span className="opacity-30">/</span>
                                 <Link
                                     href={`/category/${article!.category.parent.slug}`}
-                                    className="hover:text-blue-600 transition-colors"
+                                    className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                 >
                                     {article!.category.parent.name}
                                 </Link>
@@ -214,18 +246,18 @@ export default async function ArticlePage({ params }: PageProps) {
                                 <span className="opacity-30">/</span>
                                 <Link
                                     href={`/category/${article!.category.slug}`}
-                                    className="hover:text-blue-600 transition-colors"
+                                    className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                 >
                                     {article!.category.name}
                                 </Link>
                             </>
                         )}
                         <span className="opacity-30">/</span>
-                        <span className="text-gray-900 font-medium truncate">{article!.title}</span>
+                        <span className="text-gray-900 dark:text-slate-200 font-medium truncate">{article!.title}</span>
                     </nav>
 
                     {/* Meta */}
-                    <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
+                    <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-slate-400 mb-4">
                         {article!.category && (
                             <span className="uppercase text-xs tracking-wide">
                                 {article!.category.name}
@@ -241,11 +273,13 @@ export default async function ArticlePage({ params }: PageProps) {
                                 })}
                             </time>
                         )}
+                        <span aria-hidden="true">•</span>
+                        <span>{readingTime} min read</span>
                     </div>
 
                     {/* Title & Like Button */}
                     <div className="flex justify-between items-start gap-4 mb-6">
-                        <h1 className="text-4xl font-bold text-gray-900 leading-tight flex-1">
+                        <h1 className="text-4xl font-bold text-gray-900 dark:text-white leading-tight flex-1">
                             {article!.title}
                         </h1>
                         <div className="flex-shrink-0 pt-2">
@@ -255,8 +289,8 @@ export default async function ArticlePage({ params }: PageProps) {
 
                     {/* Author */}
                     {article!.author && (
-                        <div className="flex items-center gap-3 mb-8 pb-8 border-b border-gray-200">
-                            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-sm font-medium text-gray-600 overflow-hidden">
+                        <div className="flex items-center gap-3 mb-8 pb-8 border-b border-gray-200 dark:border-slate-700">
+                            <div className="w-10 h-10 bg-gray-200 dark:bg-slate-700 rounded-full flex items-center justify-center text-sm font-medium text-gray-600 dark:text-slate-300 overflow-hidden">
                                 {article!.author.avatar ? (
                                     <Image
                                         src={getImageUrl(article!.author.avatar, 'thumbnail') || ''}
@@ -270,11 +304,11 @@ export default async function ArticlePage({ params }: PageProps) {
                                 )}
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-gray-700">
+                                <p className="text-sm font-medium text-gray-700 dark:text-slate-300">
                                     {article!.author.name}
                                 </p>
                                 {article!.author.bio && (
-                                    <p className="text-sm text-gray-500">
+                                    <p className="text-sm text-gray-500 dark:text-slate-400">
                                         {article!.author.bio}
                                     </p>
                                 )}
@@ -285,7 +319,7 @@ export default async function ArticlePage({ params }: PageProps) {
                     {/* Cover Image */}
                     {coverUrl && (
                         <figure className="mb-8">
-                            <div className="relative w-full aspect-video bg-gray-100">
+                            <div className="relative w-full aspect-video bg-gray-100 dark:bg-slate-800">
                                 <Image
                                     src={coverUrl}
                                     alt={article!.coverImage?.alternativeText || article!.title}
@@ -305,7 +339,7 @@ export default async function ArticlePage({ params }: PageProps) {
                                 <BlockRenderer key={block.id || index} block={block} />
                             ))
                         ) : (
-                            <p className="text-gray-500 italic">
+                            <p className="text-gray-500 dark:text-slate-400 italic">
                                 No content yet.
                             </p>
                         )}
@@ -315,15 +349,21 @@ export default async function ArticlePage({ params }: PageProps) {
                 </article>
 
                 {/* Sidebar - Sticky */}
-                <aside className="hidden lg:block w-72 flex-shrink-0" aria-label="Related articles">
-                    <div className="sticky top-32">
+                <aside className="hidden lg:block w-72 flex-shrink-0" aria-label="Article navigation">
+                    <div className="sticky top-32 space-y-8">
+                        {/* Table of Contents */}
+                        {allHeadings.length > 0 && (
+                            <TableOfContents headings={allHeadings} />
+                        )}
+
+                        {/* More Articles */}
                         <MoreArticles currentSlug={slug} />
                     </div>
                 </aside>
             </div>
 
             {/* Mobile More Articles */}
-            <div className="lg:hidden mt-12 pt-12 border-t border-gray-100">
+            <div className="lg:hidden mt-12 pt-12 border-t border-gray-100 dark:border-slate-800">
                 <MoreArticles currentSlug={slug} />
             </div>
         </PageLayout>
@@ -348,14 +388,6 @@ function BlockRenderer({ block }: { block: ContentBlock }) {
             );
 
         case 'blocks.code-block':
-            // Check if it's mermaid or plantuml, otherwise render standard code block
-            // Actually, code-block component in Strapi might be separate from rich text code blocks.
-            // If the user wants mermaid/plantuml in code blocks, they should use rich text or we handle it here.
-            // For now, render standard code block, but if language is mermaid/plantuml, maybe render diagram?
-            // The request was "mention in blog that anything it should pick up automatically".
-            // If they use standard markdown code blocks, they are inside rich-text.
-            // If they use the dedicated "Code Block" component in Strapi, we handle it here.
-
             if (block.language === 'mermaid') {
                 return (
                     <div className="my-6">
@@ -373,13 +405,13 @@ function BlockRenderer({ block }: { block: ContentBlock }) {
 
             return (
                 <div className="my-6">
-                    <pre className="bg-gray-100 p-4 overflow-x-auto border border-gray-200 rounded-lg">
-                        <code className="text-sm font-mono text-gray-800">
+                    <pre className="bg-gray-100 dark:bg-slate-800 p-4 overflow-x-auto border border-gray-200 dark:border-slate-700 rounded-lg">
+                        <code className="text-sm font-mono text-gray-800 dark:text-slate-200">
                             {block.code}
                         </code>
                     </pre>
                     {block.language && (
-                        <p className="text-xs text-gray-500 mt-1">{block.language}</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{block.language}</p>
                     )}
                 </div>
             );

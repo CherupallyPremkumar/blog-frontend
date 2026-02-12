@@ -84,6 +84,12 @@ export default function RootLayout({
         {/* Preconnect to Strapi for faster image loading */}
         <link rel="preconnect" href={process.env.NEXT_PUBLIC_STRAPI_API_URL || "https://api.ioclick.me"} />
         <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_STRAPI_API_URL || "https://api.ioclick.me"} />
+        {/* FOUC prevention: apply dark class before paint */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme');var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme:dark)').matches);if(d)document.documentElement.classList.add('dark')}catch(e){}})()`,
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
