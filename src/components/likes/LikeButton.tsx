@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { createLike, deleteLike } from '@/lib/api';
+import { useState, useEffect } from 'react';
+import { createLike, deleteLike, getLikes } from '@/lib/api';
 import type { Like } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -14,6 +14,15 @@ export default function LikeButton({ articleId, initialLikes }: LikeButtonProps)
     const [likes, setLikes] = useState<Like[]>(initialLikes);
     const [loading, setLoading] = useState(false);
     const { user, openAuthModal } = useAuth();
+
+    // Re-fetch likes when user logs in (server-side fetch may lack user relations)
+    useEffect(() => {
+        if (user) {
+            getLikes(articleId)
+                .then(freshLikes => setLikes(freshLikes))
+                .catch(() => { /* keep initialLikes on error */ });
+        }
+    }, [user, articleId]);
 
     const userLikedLike = user ? likes.find(l => l.user?.id === user.id) : undefined;
     const isLiked = !!userLikedLike;
@@ -37,9 +46,15 @@ export default function LikeButton({ articleId, initialLikes }: LikeButtonProps)
                 const likeWithUser = { ...newLike, user: user };
                 setLikes([...likes, likeWithUser]);
             }
-        } catch (error) {
-            console.error('Failed to toggle like', error);
-            alert('Something went wrong. Please try again.');
+        } catch (error: unknown) {
+            // Handle "already liked" error by re-fetching to sync state
+            const apiErr = error as { status?: number; message?: string };
+            if (apiErr.status === 400 || apiErr.message?.includes('already liked')) {
+                const freshLikes = await getLikes(articleId).catch(() => likes);
+                setLikes(freshLikes);
+            } else {
+                console.error('Failed to toggle like', error);
+            }
         } finally {
             setLoading(false);
         }
